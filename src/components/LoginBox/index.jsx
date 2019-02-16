@@ -26,12 +26,18 @@ class LoginBox extends Component {
       <div className="loginbox">
         <div className="loginbox-field">
           <span>Username</span>
-          <input type="text" onChange={event => this.onChangeUsername(event)} />
+          <input
+            type="text"
+            onChange={event => this.onChangeUsername(event)}
+          />
         </div>
 
         <div className="loginbox-field">
           <span>Password</span>
-          <input type="text" onChange={event => this.onChangePassword(event)} />
+          <input
+            type="password"
+            onChange={event => this.onChangePassword(event)}
+          />
         </div>
 
         <div className="loginbox-submit-container">

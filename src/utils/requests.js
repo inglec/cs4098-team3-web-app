@@ -6,7 +6,13 @@
 // TODO: Actually do authentication.
 export const authenticate = (username, password) => (
   // axios.post(AUTH_SERVER_URL, { username, password })
-  username && password
-    ? Promise.resolve('testtoken')
-    : Promise.reject(Error('bad credentials'))
+  new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (username && password) {
+        resolve('testtoken');
+      } else {
+        reject(Error('bad credentials'));
+      }
+    }, 2000);
+  })
 );

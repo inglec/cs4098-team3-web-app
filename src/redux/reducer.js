@@ -8,10 +8,10 @@ import {
 } from './actions';
 
 // Data states.
-const LOADING = 'LOADING';
-const LOADED = 'LOADED';
+export const LOADING = 'LOADING';
+export const LOADED = 'LOADED';
 
-const setDataState = (status, data) => ({
+const createDataState = (status, data) => ({
   status,
   ...data,
 });
@@ -19,16 +19,16 @@ const setDataState = (status, data) => ({
 const auth = (state = {}, action) => {
   switch (action.type) {
     case LOG_IN_STARTED:
-      return setDataState(LOADING);
+      return createDataState(LOADING);
     case LOG_IN_SUCCESS:
-      return setDataState(LOADED, {
+      return createDataState(LOADED, {
         username: action.username,
         token: action.token,
       });
     case LOG_IN_FAILURE:
-      return setDataState(LOADED, { error: action.error.message });
+      return createDataState(LOADED, { error: action.error.message });
     case LOG_OUT:
-      return setDataState(LOADED);
+      return createDataState(LOADED);
     default:
       return state;
   }
