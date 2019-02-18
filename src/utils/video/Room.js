@@ -3,8 +3,9 @@ import mediasoupClient from 'mediasoup-client';
 
 import MediaSource from './MediaSource';
 
-class Room {
+class Room extends EventTarget {
   constructor(url) {
+    super();
     this.url = url;
     this.mediasoupRoom = mediasoupClient.Room();
     this.remoteSources = new Map();
@@ -28,7 +29,7 @@ class Room {
     return this.remoteSources.values();
   }
 
-  join(user) {
+  join(user, callback) {
     // TODO: Will have to obtain some auth token from a secure location
     const token = 'abc';
     const query = { ...user, token };
@@ -65,11 +66,22 @@ class Room {
         audioProducer.send(this.transports.send);
         videoProducer.send(this.transports.send);
       })
-      .catch(error => console.error(error));
+      .then(() => {
+        callback(null);
+      })
+      .catch((error) => {
+        console.error(error);
+        callback(error);
+      });
   }
 
   peerSetup(peer) {
-    peer.on('close', () => console.debug(`${peer.name} has left`));
+    peer.on('close', () => {
+      // TODO: Make sure 'this' is indeed this (Room)
+      // TODO: Change peer to be whatever the component needs to track state
+      this.dispatchEvent(new CustomEvent('peer-close'), { peer });
+      console.debug(`${peer.name} has left`);
+    });
     peer.on('newconsumer', (consumer) => {
       console.debug('Got a new Remote Consumer');
       this.consumerSetup(consumer);
