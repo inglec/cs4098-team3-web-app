@@ -50,6 +50,7 @@ class Peer {
       default:
         console.debug('Unrecognized event for Room : ', eventname);
     }
+    return this;
   }
 
   emit(eventname, obj) {

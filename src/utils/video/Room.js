@@ -104,6 +104,7 @@ class Room {
       default:
         console.debug('Unrecognized event for Room : ', eventname);
     }
+    return this;
   }
 
   sendMessage() {
