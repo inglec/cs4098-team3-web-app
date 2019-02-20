@@ -1,127 +1,153 @@
 import io from 'socket.io-client';
 import mediasoupClient from 'mediasoup-client';
 
-import MediaSource from './MediaSource';
+import Peer from './Peer';
+/*
+  Events:
+    -- When the room closes (locally or remotely)
+    room-close: {}
 
-class Room extends EventTarget {
-  constructor(url) {
-    super();
-    this.url = url;
-    this.mediasoupRoom = mediasoupClient.Room();
-    this.remoteSources = new Map();
-    this.transports = {
-      send: null,
-      recv: null,
-    };
+    -- When a new user joins the room
+    room-newuser: {user}
+
+    => See Peer.js for events that can be listened for on object 'user'
+*/
+
+/*
+  REVIEW:
+    Need to consider async when emitting events, might be relevant
+    See about bable having arrow function syntax for autobinding
+     - LINK: https://medium.com/quick-code/react-quick-tip-use-class-properties-and-arrow-functions-to-avoid-binding-this-to-methods-29628aca2e25
+*/
+class Room {
+  constructor() {
+    // super();
+    this.mediasouproom = mediasoupClient.Room();
+    this.peers = new Map();
     this.socket = null;
+    this.muted = false;
+    this.listeners = {
+      roomclose: [],
+      roomnewuser: [],
+    };
 
-    this.peerSetup = this.peerSetup.bind(this);
-    this.consumerSetup = this.consumerSetup.bind(this);
-    this.notifyHandler = this.notifyHandler.bind(this);
-    this.requestHandler = this.requestHandler.bind(this);
+    // Socket Event handles
+    this.onSocketNotification = this.onSocketNotification.bind(this);
 
-    this.mediasoupRoom.on('newpeer', this.peerSetup);
-    this.mediasoupRoom.on('notify', this.notifyHandler);
-    this.mediasoupRoom.on('request', this.requestHandler);
+    // Local Room Event Handles
+    this.onRoomClose = this.onRoomClose.bind(this);
+    this.onRoomNewPeer = this.onRoomNewPeer.bind(this);
+    this.onRoomRequest = this.onRoomRequest.bind(this);
+    this.onRoomNotify = this.onRoomNotify.bind(this);
+
+    // Connect event listeners
+    this.mediasouproom.on('close', this.onRoomClose);
+    this.mediasouproom.on('newpeer', this.onRoomNewPeer);
+    this.mediasouproom.on('request', this.onRoomRequest);
+    this.mediasouproom.on('notify', this.onRoomNotify);
   }
 
-  getStreams() {
-    return this.remoteSources.values();
-  }
-
-  join(user, callback) {
-    // TODO: Will have to obtain some auth token from a secure location
-    const token = 'abc';
+  join(url, user, token) {
+    // Create a query
     const query = { ...user, token };
-    this.socket = io(this.url, { ...query });
-    this.socket.on('mediasoup-notification', (notification) => {
-      this.mediasoupRoom.receiveNotification(notification);
-    });
 
-    // Join the local representation of the room
-    this.mediasoupRoom.join(user.peerId)
-      .then((peers) => {
-        // Create transports and setup connections to other peers if any
-        this.transports.send = this.mediasoupRoom.createTransport('send');
-        this.transports.recv = this.mediasoupRoom.createTransport('recv');
-        peers.forEach((peer) => {
-          this.peerSetup(peer);
-          peer.consumers.forEach(consumer => this.consumerSetup(consumer));
-        });
-      })
-      .then(() => {
-        // Get user media streams
-        const mediaStream = navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: true,
-        });
-        const audio = mediaStream.getAudioTracks()[0];
-        const video = mediaStream.getVideoTracks()[0];
-        return { audio, video };
-      })
-      .then(({ audio, video }) => {
-        // Create Producers and direct them to stream over the Transports
-        const audioProducer = this.mediasoupRoom.createProducer(audio);
-        const videoProducer = this.mediasroomoupRoom.createProducer(video);
+    // Connect our local and remote room through a socket
+    this.socket = io(url, query);
+    this.socket.on('mediasoup-notification', this.socketOnNotification);
+
+    // Join the room
+    this.mediasouproom.join(user.username)
+      .then((otherPeers) => {
+        // Create transports , TODO: see if this can be done before joining as room
+        this.transports.send = this.mediasouproom.createTransport('send');
+        this.transports.recv = this.mediasouproom.createTransport('recv');
+
+        // Setup all the handles for every other peer already in the room
+        otherPeers.forEach(mediasoupPeer => this.onRoomNewPeer(mediasoupPeer));
+
+        // Get our user media TODO: find out what happens if the reject
+        const mediastream = navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+
+        // Create producers for both video and audio
+        const audio = mediastream.getAudioTracks()[0];
+        const video = mediastream.getVideoTracks()[0];
+        const audioProducer = this.mediasouproom.createProducer(audio);
+        const videoProducer = this.mediasouproom.createProducer(video);
+
+        // Send our produced video over send transport to the remote room
         audioProducer.send(this.transports.send);
         videoProducer.send(this.transports.send);
+
+        // REVIEW: is this correct?
+        return Promise.resolve();
       })
-      .then(() => {
-        callback(null);
-      })
-      .catch((error) => {
-        console.error(error);
-        callback(error);
-      });
+      // TODO: probably some errors I should deal with here
+      .catch(error => Promise.reject(error));
   }
 
-  peerSetup(peer) {
-    peer.on('close', () => {
-      // TODO: Make sure 'this' is indeed this (Room)
-      // TODO: Change peer to be whatever the component needs to track state
-      this.dispatchEvent(new CustomEvent('peer-close'), { peer });
-      console.debug(`${peer.name} has left`);
-    });
-    peer.on('newconsumer', (consumer) => {
-      console.debug('Got a new Remote Consumer');
-      this.consumerSetup(consumer);
-    });
+  leave() {
+    this.mediasouproom.leave();
   }
 
-  consumerSetup(consumer) {
-    consumer.on('close', () => console.debug('Consumer closed'));
-
-    consumer.receive(this.transports.recv)
-      .then((track) => {
-        console.debug(`Receiving media stream: ${consumer.kind} from ${consumer.peer.name}`);
-        if (!this.remoteSources.has(consumer.peer.id)) {
-          this.remoteSources.set(consumer.peer.id, new MediaSource(consumer.peer));
-        }
-
-        const mediaSource = this.remoteSources.get(consumer.peer.id);
-        if (consumer.kind === 'video') {
-          mediaSource.addVideoTrack(track);
-        }
-        if (consumer.kind === 'audio') {
-          mediaSource.addAudioTrack(track);
-        }
-      })
-      .catch(err => console.error(err));
+  emit(eventname, obj) {
+    this.listeners[eventname].forEach(cb => cb(obj));
   }
 
-  requestHandler(request, callback, errback) {
-    console.debug('Req:', request);
+  on(eventname, callback) {
+    switch (eventname) {
+      case 'room-close':
+        this.listeners.roomclose.append(callback);
+        break;
+      case 'room-newuser':
+        this.listeners.roomnewusers.append(callback);
+        break;
+      default:
+        console.debug('Unrecognized event for Room : ', eventname);
+    }
+  }
+
+  sendMessage() {
+    // TODO
+    console.debug('message');
+  }
+
+  tick() {
+    // TODO
+    console.debug('tick');
+  }
+
+  mute() { this.muted = true; }
+
+  toggleMute() { this.muted = !this.muted; }
+
+  isMuted() { return this.muted; }
+
+  onSocketNotification(notification) {
+    this.mediasouproom.receiveNotification(notification);
+  }
+
+  onRoomClose() {
+    // Not fully sure how much to clean up
+    // probably best to just create a new Room and close socket
+    this.emitRoomclose();
+    this.socket.close();
+  }
+
+  onRoomNewPeer(newpeer) {
+    const peer = new Peer(newpeer);
+    this.peers.set(peer.name, peer);
+    peer.on('user-disconnect', ({ username }) => this.peers.delete(username));
+    this.emitRoomnewuser({ user: peer });
+  }
+
+  onRoomRequest(request, callback, errback) {
     this.socket.emit('mediasoup-request', request, (err, response) => {
-      if (!err) {
-        callback(response);
-      } else {
-        errback(err);
-      }
+      if (err) errback(err);
+      else callback(response);
     });
   }
 
-  notifyHandler(notification) {
-    console.debug('Notification:', notification);
+  onRoomNotify(notification) {
     this.socket.emit('mediasoup-notification', notification);
   }
 }
