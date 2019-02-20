@@ -4,10 +4,11 @@
     user-disconnect: {username}
 
     -- When this user adds media that we are receiving
-    user-add-media: {username, mediakind, mediastream }
+    user-addmedia: {username, mediakind}
 
     -- When this user stops streaming to us or we stop receiving
-    user-remove-media: {username, mediakind}
+    user-removemedia: {username, mediakind}
+
 */
 
 class Peer {
@@ -36,16 +37,30 @@ class Peer {
     this.mediasoupPeer.consumers.forEach(consumer => this.onNewConsumer(consumer));
   }
 
+  audio() {
+    if (this.consumers.audio) {
+      return this.consumers.video.audio;
+    }
+    return null;
+  }
+
+  video() {
+    if (this.consumers.video) {
+      return this.consumers.video.track;
+    }
+    return null;
+  }
+
   on(eventname, callback) {
     switch (eventname) {
       case 'user-disconnect':
-        this.listeners.userdisconnect.append(callback);
+        this.listeners.userdisconnect.push(callback);
         break;
       case 'user-addmedia':
-        this.listeners.useraddmedia.append(callback);
+        this.listeners.useraddmedia.push(callback);
         break;
       case 'user-removemedia':
-        this.listeners.userremovemedia.append(callback);
+        this.listeners.userremovemedia.push(callback);
         break;
       default:
         console.debug('Unrecognized event for Room : ', eventname);
@@ -64,11 +79,7 @@ class Peer {
   onNewConsumer(consumer) {
     // Recieve the new consumer
     consumer.receive(this.room.transports.recv)
-      .then((track) => {
-        // Create the media stream from the incoming track
-        const stream = new MediaStream();
-        stream.addTrack(track);
-
+      .then(() => {
         // Add reference to this consumer
         if (consumer.kind === 'audio') {
           this.consumers.audio = consumer;
@@ -81,7 +92,6 @@ class Peer {
         this.emit('user-newmedia', {
           username: this.name,
           mediakind: consumer.kind,
-          mediastream: stream,
         });
       })
       .catch((error) => {

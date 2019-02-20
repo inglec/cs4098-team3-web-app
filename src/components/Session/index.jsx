@@ -2,7 +2,8 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 
-// import Room from 'app-utils/Mediasoup';
+import Room from 'app-utils/video/Room';
+import Peer from 'app-utils/video/Peer';
 
 import Chat from './Chat';
 import Options from './Options';
@@ -10,26 +11,21 @@ import Video from './Video';
 
 import './styles';
 
-// TODO: Remove dummy class.
-class Room {
-  constructor() {}
-  isMuted() { return false; }
-  join() {}
-  leave() {}
-  mute() {}
-  on() { return this; }
-  sendMessage() {}
-  tick() {}
-  toggleMute() {}
-}
+/*
+  Eddie :
+    Using this as a guide on modifying react state
+    https://www.robinwieruch.de/react-state-array-add-update-remove/
 
+    Not sure how updates to users will interact with react lifecycle as it only
+    does shallow comparisons
+    https://reactjs.org/docs/react-component.html#setstate
+*/
+
+//
 // const state = {
-//   users: {
-//     String: {
-//       audioStream: Object,
-//       videoStream: Object,
-//     },
-//   },
+//
+//   users: [ Peer ],
+//
 //   messages: [
 //     {
 //       username: String,
@@ -38,50 +34,83 @@ class Room {
 //     },
 //   ],
 // };
-
 class Session extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       messages: [],
-
-      // TODO: Replace with empty object.
-      users: {
-        a: { videoStream: 'http://techslides.com/demos/sample-videos/small.mp4' },
-        b: { videoStream: 'http://techslides.com/demos/sample-videos/small.mp4' },
-        c: { videoStream: 'http://techslides.com/demos/sample-videos/small.mp4' },
-        d: { videoStream: 'http://techslides.com/demos/sample-videos/small.mp4' },
-        e: { videoStream: 'http://techslides.com/demos/sample-videos/small.mp4' },
-        f: { videoStream: 'http://techslides.com/demos/sample-videos/small.mp4' },
-      },
+      users: [],
     };
 
     const { token, url, username } = props;
 
+    //TEMP
+    const tempname = Math.random().toString(36).substring(7);
+    const tempurl = 'http://localhost:8081/'
+
     this.room = new Room();
     this.room
-      .on('user-connect', this.addUser)
-      .on('user-disconnect', this.removeUser)
-      .on('user-add-media', this.addMedia)
-      .on('user-remove-media', this.removeMedia);
-    this.room.join(url, username, token);
+      .on('room-close', this.onRoomClose)
+      .on('room-userconnect', this.onUserConnect);
+    //TEMP
+    this.room.join(tempurl, tempname, token);
+    //this.room.join(url, username, token);
   }
 
   componentWillUnmount() {
     this.room.leave();
   }
 
-  addUser(user) {
-    this.setState({
-      [user.username]: _.pick(user, ['audioStream', 'videoStream']),
+  onRoomClose() {
+    console.debug('room close fired');
+    this.setState({ users: [] });
+  }
+
+  onUserConnect(user) {
+    //Set up event listeners
+    user
+      .on('user-disconnect', this.onUserDisconnect)
+      .on('user-addmedia', this.onUserAddMedia)
+      .on('user-removemedia', this.onUserRemoveMedia)
+
+    //Add the user to state
+    this.setState(state => {
+      const users = state.users.push(user);
+      return { ...state, users }
+    });
+
+  }
+
+  onUserDisconnect(username) {
+    //Remove the user from state
+    /* REVIEW: what if multiple users have the same name, need a unique identifier */
+    this.setState(state => {
+      const users = state.users.filter(user => user.name != username);
+      return { ...state, users }
     });
   }
 
-  removeUser(username) {
-    this.setState(state => ({
-      users: _.pickBy(state.users, (user, key) => key !== username),
-    }));
+  onUserAddMedia(username, mediakind) {
+    const user = this.state.users.find(user => user.name = username)
+
+    if (mediakind === 'video') {
+      const videoStream = user.video();
+      //Do something with the video
+    } else if (mediakind === 'audio') {
+      const audioStream = user.audio();
+      //Do something with the audio
+    }
+  }
+
+  onUserRemoveMedia(username, mediakind) {
+    //Not sure what state change we might want here
+    const user = this.state.users.find(user => user.name = username)
+    if (mediakind === 'video') {
+
+    } else if (mediakind === 'audio') {
+
+    }
   }
 
   render() {
@@ -94,16 +123,15 @@ class Session extends Component {
             <div className="videos">
               {
                 // Might need to change so that state update doesn't rerender all videos.
-                _.map(users, (user, username) => {
-                  const { audioStream, videoStream } = user;
+                users.map(user => {
                   return (
                     <Video
-                      audioStream={audioStream}
-                      key={username}
-                      mute={() => this.room.mute(username)}
-                      tick={() => this.room.tick(username)}
-                      username={username}
-                      videoStream={videoStream}
+                      audioStream={user.audio()}
+                      key={user.name}
+                      mute={() => this.room.mute(user.name)}
+                      tick={() => this.room.tick(user.name)}
+                      username={user.name}
+                      videoStream={user.video()}
                     />
                   );
                 })

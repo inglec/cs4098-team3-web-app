@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
-import mediasoupClient from 'mediasoup-client';
+import { Room as MediasoupRoom } from 'mediasoup-client';
 
 import Peer from './Peer';
 /*
@@ -8,7 +8,7 @@ import Peer from './Peer';
     room-close: {}
 
     -- When a new user joins the room
-    room-newuser: {user}
+    room-userconnect: {user}
 
     => See Peer.js for events that can be listened for on object 'user'
 */
@@ -22,7 +22,7 @@ import Peer from './Peer';
 class Room {
   constructor() {
     // super();
-    this.mediasouproom = mediasoupClient.Room();
+    this.mediasouproom = new MediasoupRoom();
     this.peers = new Map();
     this.socket = null;
     this.muted = false;
@@ -47,18 +47,20 @@ class Room {
     this.mediasouproom.on('notify', this.onRoomNotify);
   }
 
-  join(url, user, token) {
+  join(url, username, token) {
     // Create a query
-    const query = { ...user, token };
+    const query = { username, token };
 
     // Connect our local and remote room through a socket
     this.socket = io(url, query);
     this.socket.on('mediasoup-notification', this.socketOnNotification);
 
     // Join the room
-    this.mediasouproom.join(user.username)
+    this.mediasouproom.join(username)
       .then((otherPeers) => {
         // Create transports , TODO: see if this can be done before joining as room
+        console.debug(otherPeers);
+
         this.transports.send = this.mediasouproom.createTransport('send');
         this.transports.recv = this.mediasouproom.createTransport('recv');
 
@@ -96,10 +98,10 @@ class Room {
   on(eventname, callback) {
     switch (eventname) {
       case 'room-close':
-        this.listeners.roomclose.append(callback);
+        this.listeners.roomclose.push(callback);
         break;
-      case 'room-newuser':
-        this.listeners.roomnewusers.append(callback);
+      case 'room-userconnect':
+        this.listeners.roomnewuser.push(callback);
         break;
       default:
         console.debug('Unrecognized event for Room : ', eventname);
@@ -107,13 +109,13 @@ class Room {
     return this;
   }
 
-  sendMessage() {
+  sendMessage(message) {
     // TODO
-    console.debug('message');
+    console.debug('message: ', message);
   }
 
-  tick() {
-    // TODO
+  tick(username) {
+    // TODO think of ticking system , username is name of person who was ticked
     console.debug('tick');
   }
 
@@ -138,7 +140,7 @@ class Room {
     const peer = new Peer(newpeer);
     this.peers.set(peer.name, peer);
     peer.on('user-disconnect', ({ username }) => this.peers.delete(username));
-    this.emitRoomnewuser({ user: peer });
+    this.emitRoomnewuser(peer);
   }
 
   onRoomRequest(request, callback, errback) {
