@@ -1,0 +1,39 @@
+.session {
+  display: flex;
+  width: 100%;
+
+  .session-main {
+    align-items: center;
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5px;
+    overflow-x: hidden;
+
+    .videos-container {
+      display: flex;
+      margin-bottom: 5px;
+      padding: 5px;
+      width: 100%;
+
+      .videos {
+        background-color: black;
+        display: grid;
+        flex: auto;
+        grid-gap: 5px;
+        grid-template-columns: auto auto auto;
+        overflow: auto;
+        padding: 5px;
+      }
+    }
+
+    .options {
+      flex: none;
+    }
+  }
+
+  .chat {
+    flex: none;
+  }
+}

@@ -16,7 +16,7 @@ const createDataState = (status, data) => ({
   ...data,
 });
 
-const auth = (state = {}, action) => {
+const auth = (state = { username: 'test', token: 'testtoken' }, action) => {
   switch (action.type) {
     case LOG_IN_STARTED:
       return createDataState(LOADING);

@@ -5,9 +5,9 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
 import NotFound from 'app-components/NotFound';
 import Profile from 'app-components/Profile';
-import Session from 'app-components/Session';
 import Home from 'app-containers/Home';
 import Login from 'app-containers/Login';
+import Session from 'app-containers/Session';
 
 import './styles';
 
