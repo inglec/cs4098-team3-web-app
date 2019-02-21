@@ -12,9 +12,9 @@
 */
 
 class Peer {
-  constructor(mediasoupPeer, room) {
-    this.mediasoupPeer = mediasoupPeer;
-    this.name = mediasoupPeer.name;
+  constructor(msPeer, room) {
+    this.msPeer = msPeer;
+    this.name = msPeer.name;
     this.room = room;
     this.consumers = {
       video: null,
@@ -31,11 +31,11 @@ class Peer {
     this.onNewConsumer = this.onNewConsumer.bind(this);
 
     // Setup event handlers
-    this.mediasoupPeer.on('close', this.onClose);
-    this.mediasoupPeer.on('newconsumer', this.onNewConsumer);
+    this.msPeer.on('close', this.onClose);
+    this.msPeer.on('newconsumer', this.onNewConsumer);
 
     // Setup all consumer for this peer
-    this.mediasoupPeer.consumers.forEach(consumer => this.onNewConsumer(consumer));
+    this.msPeer.consumers.forEach(consumer => this.onNewConsumer(consumer));
   }
 
   audio() {

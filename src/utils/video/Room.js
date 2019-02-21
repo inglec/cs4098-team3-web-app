@@ -22,10 +22,10 @@ import Peer from './Peer';
 class Room {
   constructor() {
     // super();
-    this.mediasouproom = new MediasoupRoom();
+    this.msRoom = new MediasoupRoom();
     this.peers = new Map();
     this.socket = null;
-    this.muted = false;
+    this.isMuted = false;
     this.transports = {
       send: null,
       recv: null,
@@ -45,10 +45,10 @@ class Room {
     this.onRoomNotify = this.onRoomNotify.bind(this);
 
     // Connect event listeners
-    this.mediasouproom.on('close', this.onRoomClose);
-    this.mediasouproom.on('newpeer', this.onRoomNewPeer);
-    this.mediasouproom.on('request', this.onRoomRequest);
-    this.mediasouproom.on('notify', this.onRoomNotify);
+    this.msRoom.on('close', this.onRoomClose);
+    this.msRoom.on('newpeer', this.onRoomNewPeer);
+    this.msRoom.on('request', this.onRoomRequest);
+    this.msRoom.on('notify', this.onRoomNotify);
   }
 
   join(url, username, token) {
@@ -59,11 +59,11 @@ class Room {
     this.socket.on('mediasoup-notification', this.socketOnNotification);
 
     // Join the room
-    return this.mediasouproom.join(username)
+    return this.msRoom.join(username)
       .then((otherPeers) => {
         // Create transports , TODO: see if this can be done before joining as room
-        this.transports.send = this.mediasouproom.createTransport('send');
-        this.transports.recv = this.mediasouproom.createTransport('recv');
+        this.transports.send = this.msRoom.createTransport('send');
+        this.transports.recv = this.msRoom.createTransport('recv');
 
         // Setup all the handles for every other peer already in the room
         otherPeers.forEach(mediasoupPeer => this.onRoomNewPeer(mediasoupPeer));
@@ -75,8 +75,8 @@ class Room {
         // Create producers for both video and audio
         const audio = mediastream.getAudioTracks()[0];
         const video = mediastream.getVideoTracks()[0];
-        const audioProducer = this.mediasouproom.createProducer(audio);
-        const videoProducer = this.mediasouproom.createProducer(video);
+        const audioProducer = this.msRoom.createProducer(audio);
+        const videoProducer = this.msRoom.createProducer(video);
 
         // Send our produced video over send transport to the remote room
         audioProducer.send(this.transports.send);
@@ -85,7 +85,7 @@ class Room {
   }
 
   leave() {
-    this.mediasouproom.leave();
+    this.msRoom.leave();
   }
 
   on(eventname, callback) {
@@ -115,15 +115,15 @@ class Room {
     console.debug('tick');
   }
 
-  mute() { this.muted = true; }
+  mute() { this.isMuted = true; }
 
-  toggleMute() { this.muted = !this.muted; }
+  toggleMute() { this.isMuted = !this.isMuted; }
 
-  isMuted() { return this.muted; }
+  isMuted() { return this.isMuted; }
 
   onSocketNotification(notification) {
     console.debug('Notification recieved:', notification);
-    this.mediasouproom.receiveNotification(notification);
+    this.msRoom.receiveNotification(notification);
   }
 
   onRoomClose() {
