@@ -43,6 +43,10 @@ class Session extends Component {
       users: [],
     };
 
+    //Sadly this was needed
+    this.onRoomClose = this.onRoomClose.bind(this);
+    this.onUserConnect = this.onUserConnect.bind(this);
+
     const { token, url, username } = props;
 
     //TEMP
@@ -54,7 +58,10 @@ class Session extends Component {
       .on('room-close', this.onRoomClose)
       .on('room-userconnect', this.onUserConnect);
     //TEMP
-    this.room.join(tempurl, tempname, token);
+
+    this.room.join(tempurl, tempname, token)
+      .then(() => console.debug('joined'))
+      .catch((error) => console.error(error));
     //this.room.join(url, username, token);
   }
 
@@ -70,23 +77,20 @@ class Session extends Component {
   onUserConnect(user) {
     //Set up event listeners
     user
-      .on('user-disconnect', this.onUserDisconnect)
-      .on('user-addmedia', this.onUserAddMedia)
-      .on('user-removemedia', this.onUserRemoveMedia)
+      .on('user-disconnect', () => console.debug('Hook up user-disconnect'))
+      .on('user-addmedia', () => console.debug('Hook up user-addmedia'))
+      .on('user-removemedia', () => console.debug('Hook up user-removemedia'));
 
+    console.debug('user in onuserconnect', user)
     //Add the user to state
-    this.setState(state => {
-      const users = state.users.push(user);
-      return { ...state, users }
-    });
-
+    this.setState(state => ({ users: [...state.users, user] }));
   }
 
   onUserDisconnect(username) {
     //Remove the user from state
     /* REVIEW: what if multiple users have the same name, need a unique identifier */
     this.setState(state => {
-      const users = state.users.filter(user => user.name != username);
+      const users = this.state.users.filter(user => user.name != username);
       return { ...state, users }
     });
   }
@@ -115,7 +119,7 @@ class Session extends Component {
 
   render() {
     const { messages, users } = this.state;
-
+    console.debug('users', this.state.users);
     return (
       <div className="session">
         <div className="session-main">
@@ -123,7 +127,7 @@ class Session extends Component {
             <div className="videos">
               {
                 // Might need to change so that state update doesn't rerender all videos.
-                users.map(user => {
+                users.map((user) => {
                   return (
                     <Video
                       audioStream={user.audio()}

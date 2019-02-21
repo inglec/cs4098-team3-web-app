@@ -26,9 +26,13 @@ class Room {
     this.peers = new Map();
     this.socket = null;
     this.muted = false;
+    this.transports = {
+      send: null,
+      recv: null,
+    };
     this.listeners = {
       roomclose: [],
-      roomnewuser: [],
+      roomuserconnect: [],
     };
 
     // Socket Event handles
@@ -50,26 +54,24 @@ class Room {
   join(url, username, token) {
     // Create a query
     const query = { username, token };
-
     // Connect our local and remote room through a socket
-    this.socket = io(url, query);
+    this.socket = io(url, { query });
     this.socket.on('mediasoup-notification', this.socketOnNotification);
 
     // Join the room
-    this.mediasouproom.join(username)
+    return this.mediasouproom.join(username)
       .then((otherPeers) => {
         // Create transports , TODO: see if this can be done before joining as room
-        console.debug(otherPeers);
-
         this.transports.send = this.mediasouproom.createTransport('send');
         this.transports.recv = this.mediasouproom.createTransport('recv');
 
         // Setup all the handles for every other peer already in the room
         otherPeers.forEach(mediasoupPeer => this.onRoomNewPeer(mediasoupPeer));
 
-        // Get our user media TODO: find out what happens if the reject
-        const mediastream = navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-
+        // Get our user media as a promise
+        return navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+      })
+      .then((mediastream) => {
         // Create producers for both video and audio
         const audio = mediastream.getAudioTracks()[0];
         const video = mediastream.getVideoTracks()[0];
@@ -79,12 +81,7 @@ class Room {
         // Send our produced video over send transport to the remote room
         audioProducer.send(this.transports.send);
         videoProducer.send(this.transports.send);
-
-        // REVIEW: is this correct?
-        return Promise.resolve();
-      })
-      // TODO: probably some errors I should deal with here
-      .catch(error => Promise.reject(error));
+      });
   }
 
   leave() {
@@ -92,7 +89,16 @@ class Room {
   }
 
   emit(eventname, obj) {
-    this.listeners[eventname].forEach(cb => cb(obj));
+    switch (eventname) {
+      case 'room-close':
+        this.listeners.roomclose.forEach(cb => cb(obj));
+        break;
+      case 'room-userconnect':
+        this.listeners.roomuserconnect.forEach(cb => cb(obj));
+        break;
+      default:
+        console.debug('Unrecognized event for Room : ', eventname);
+    }
   }
 
   on(eventname, callback) {
@@ -101,7 +107,7 @@ class Room {
         this.listeners.roomclose.push(callback);
         break;
       case 'room-userconnect':
-        this.listeners.roomnewuser.push(callback);
+        this.listeners.roomuserconnect.push(callback);
         break;
       default:
         console.debug('Unrecognized event for Room : ', eventname);
@@ -126,6 +132,7 @@ class Room {
   isMuted() { return this.muted; }
 
   onSocketNotification(notification) {
+    console.debug('Notification recieved:', notification);
     this.mediasouproom.receiveNotification(notification);
   }
 
@@ -137,16 +144,22 @@ class Room {
   }
 
   onRoomNewPeer(newpeer) {
-    const peer = new Peer(newpeer);
+    const peer = new Peer(newpeer, this);
     this.peers.set(peer.name, peer);
     peer.on('user-disconnect', ({ username }) => this.peers.delete(username));
-    this.emitRoomnewuser(peer);
+    this.emit('room-userconnect', peer);
   }
 
   onRoomRequest(request, callback, errback) {
+    console.debug('Request sent:', request);
     this.socket.emit('mediasoup-request', request, (err, response) => {
-      if (err) errback(err);
-      else callback(response);
+      if (err) {
+        console.debug('Error recieved from request:', err);
+        errback(err);
+      } else {
+        console.debug('Response recieved from request:', response);
+        callback(response);
+      }
     });
   }
 

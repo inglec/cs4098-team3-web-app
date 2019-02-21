@@ -12,9 +12,10 @@
 */
 
 class Peer {
-  constructor(mediasoupPeer) {
+  constructor(mediasoupPeer, room) {
     this.mediasoupPeer = mediasoupPeer;
     this.name = mediasoupPeer.name;
+    this.room = room;
     this.consumers = {
       video: null,
       audio: null,
@@ -63,13 +64,25 @@ class Peer {
         this.listeners.userremovemedia.push(callback);
         break;
       default:
-        console.debug('Unrecognized event for Room : ', eventname);
+        console.debug('Unrecognized event for Peer : ', eventname);
     }
     return this;
   }
 
   emit(eventname, obj) {
-    this.listeners[eventname].forEach(cb => cb(obj));
+    switch (eventname) {
+      case 'user-disconnect':
+        this.listeners.userdisconnect.forEach(cb => cb(obj));
+        break;
+      case 'user-addmedia':
+        this.listeners.useraddmedia.forEach(cb => cb(obj));
+        break;
+      case 'user-removemedia':
+        this.listeners.userremovemedia.forEach(cb => cb(obj));
+        break;
+      default:
+        console.debug('Unrecognized event for Peer : ', eventname);
+    }
   }
 
   onClose() {
@@ -89,7 +102,7 @@ class Peer {
         }
 
         // Emit that new media is being consumed
-        this.emit('user-newmedia', {
+        this.emit('user-addmedia', {
           username: this.name,
           mediakind: consumer.kind,
         });
