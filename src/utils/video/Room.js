@@ -30,10 +30,10 @@ class Room {
       send: null,
       recv: null,
     };
-    this.listeners = {
-      roomclose: [],
-      roomuserconnect: [],
-    };
+
+    // Events that can listened for
+    this.listeners['room-close'] = [];
+    this.listeners['room-userconnect'] = [];
 
     // Socket Event handles
     this.onSocketNotification = this.onSocketNotification.bind(this);
@@ -88,31 +88,21 @@ class Room {
     this.mediasouproom.leave();
   }
 
-  emit(eventname, obj) {
-    switch (eventname) {
-      case 'room-close':
-        this.listeners.roomclose.forEach(cb => cb(obj));
-        break;
-      case 'room-userconnect':
-        this.listeners.roomuserconnect.forEach(cb => cb(obj));
-        break;
-      default:
-        console.debug('Unrecognized event for Room : ', eventname);
-    }
-  }
-
   on(eventname, callback) {
-    switch (eventname) {
-      case 'room-close':
-        this.listeners.roomclose.push(callback);
-        break;
-      case 'room-userconnect':
-        this.listeners.roomuserconnect.push(callback);
-        break;
-      default:
-        console.debug('Unrecognized event for Room : ', eventname);
+    if (Array.isArray(this.listeners[eventname])) {
+      this.listeners[eventname].push(callback);
+    } else {
+      console.debug('Unrecognized event for Peer : ', eventname);
     }
     return this;
+  }
+
+  emit(eventname, obj) {
+    if (Array.isArray(this.listeners[eventname])) {
+      this.listeners[eventname].forEach(cb => cb(obj));
+    } else {
+      console.debug('Unrecognized event for Peer : ', eventname);
+    }
   }
 
   sendMessage(message) {

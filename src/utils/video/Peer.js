@@ -20,11 +20,11 @@ class Peer {
       video: null,
       audio: null,
     };
-    this.listeners = {
-      userdisconnect: [],
-      useraddmedia: [],
-      userremovemedia: [],
-    };
+
+    // Events that can be listened for
+    this.listeners['user-disconnect'] = [];
+    this.listeners['user-addmedia'] = [];
+    this.listeners['user-removemedia'] = [];
 
     // Binding
     this.onClose = this.onClose.bind(this);
@@ -53,35 +53,19 @@ class Peer {
   }
 
   on(eventname, callback) {
-    switch (eventname) {
-      case 'user-disconnect':
-        this.listeners.userdisconnect.push(callback);
-        break;
-      case 'user-addmedia':
-        this.listeners.useraddmedia.push(callback);
-        break;
-      case 'user-removemedia':
-        this.listeners.userremovemedia.push(callback);
-        break;
-      default:
-        console.debug('Unrecognized event for Peer : ', eventname);
+    if (Array.isArray(this.listeners[eventname])) {
+      this.listeners[eventname].push(callback);
+    } else {
+      console.debug('Unrecognized event for Peer : ', eventname);
     }
     return this;
   }
 
   emit(eventname, obj) {
-    switch (eventname) {
-      case 'user-disconnect':
-        this.listeners.userdisconnect.forEach(cb => cb(obj));
-        break;
-      case 'user-addmedia':
-        this.listeners.useraddmedia.forEach(cb => cb(obj));
-        break;
-      case 'user-removemedia':
-        this.listeners.userremovemedia.forEach(cb => cb(obj));
-        break;
-      default:
-        console.debug('Unrecognized event for Peer : ', eventname);
+    if (Array.isArray(this.listeners[eventname])) {
+      this.listeners[eventname].forEach(cb => cb(obj));
+    } else {
+      console.debug('Unrecognized event for Peer : ', eventname);
     }
   }
 
