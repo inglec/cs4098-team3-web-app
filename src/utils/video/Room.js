@@ -115,11 +115,17 @@ class Room {
     console.debug('tick');
   }
 
-  mute() { this.isMuted = true; }
+  mute() {
+    this.isMuted = true;
+  }
 
-  toggleMute() { this.isMuted = !this.isMuted; }
+  toggleMute() {
+    this.isMuted = !this.isMuted;
+  }
 
-  isMuted() { return this.isMuted; }
+  isMuted() {
+    return this.isMuted;
+  }
 
   onSocketNotification(notification) {
     console.debug('Notification recieved:', notification);
