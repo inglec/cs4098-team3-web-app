@@ -40,12 +40,11 @@ class Session extends Component {
 
     this.state = {
       messages: [],
-      users: [],
+      users: {},
+      //I think Map makes more sense here as Peers are not nested objects
+      //users: new Map(); { peer.name -> Peer }
+      //And yes synonumus with user in this context
     };
-
-    //Sadly this was needed
-    this.onRoomClose = this.onRoomClose.bind(this);
-    this.onUserConnect = this.onUserConnect.bind(this);
 
     const { token, url, username } = props;
 
@@ -55,13 +54,13 @@ class Session extends Component {
 
     this.room = new Room();
     this.room
-      .on('room-close', this.onRoomClose)
-      .on('room-userconnect', this.onUserConnect);
+      .on('room-close',() => { this.onRoomClose() })
+      .on('room-userconnect', () => { this.onUserConnect() });
     //TEMP
 
     this.room.join(tempurl, tempname, token)
       .then(() => console.debug('joined'))
-      .catch((error) => console.error(error));
+      .catch(error => console.error(error));
     //this.room.join(url, username, token);
   }
 
@@ -71,7 +70,7 @@ class Session extends Component {
 
   onRoomClose() {
     console.debug('room close fired');
-    this.setState({ users: [] });
+    this.setState({ users: {} });
   }
 
   onUserConnect(user) {
@@ -81,23 +80,20 @@ class Session extends Component {
       .on('user-addmedia', () => console.debug('Hook up user-addmedia'))
       .on('user-removemedia', () => console.debug('Hook up user-removemedia'));
 
-    console.debug('user in onuserconnect', user)
     //Add the user to state
-    this.setState(state => ({ users: [...state.users, user] }));
+    // https://lodash.com/docs/4.17.11#assign <- hoping that does what we want
+    this.setState(state => ({ users : _.assign(state.users, { [user.name] : user } )}));
   }
 
   onUserDisconnect(username) {
     //Remove the user from state
-    /* REVIEW: what if multiple users have the same name, need a unique identifier */
-    this.setState(state => {
-      const users = this.state.users.filter(user => user.name != username);
-      return { ...state, users }
-    });
+    this.setState(state => ({
+      users: _.pickBy(state.users, (user, key) => key != username),
+    }));
   }
 
   onUserAddMedia(username, mediakind) {
-    const user = this.state.users.find(user => user.name = username)
-
+    const user = this.state.users[username];
     if (mediakind === 'video') {
       const videoStream = user.video();
       //Do something with the video
@@ -109,7 +105,7 @@ class Session extends Component {
 
   onUserRemoveMedia(username, mediakind) {
     //Not sure what state change we might want here
-    const user = this.state.users.find(user => user.name = username)
+    const user = this.state.users[username];
     if (mediakind === 'video') {
 
     } else if (mediakind === 'audio') {
