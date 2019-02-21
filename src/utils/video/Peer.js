@@ -22,9 +22,11 @@ class Peer {
     };
 
     // Events that can be listened for
-    this.listeners['user-disconnect'] = [];
-    this.listeners['user-addmedia'] = [];
-    this.listeners['user-removemedia'] = [];
+    this.listeners = {
+      'user-disconnect': [],
+      'user-addmedia': [],
+      'user-removemedia': [],
+    };
 
     // Binding
     this.onClose = this.onClose.bind(this);

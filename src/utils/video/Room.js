@@ -25,15 +25,17 @@ class Room {
     this.msRoom = new MediasoupRoom();
     this.peers = new Map();
     this.socket = null;
-    this.isMuted = false;
+    this.muteState = false;
     this.transports = {
       send: null,
       recv: null,
     };
 
     // Events that can listened for
-    this.listeners['room-close'] = [];
-    this.listeners['room-userconnect'] = [];
+    this.listeners = {
+      'room-close': [],
+      'room-userconnect': [],
+    };
 
     // Socket Event handles
     this.onSocketNotification = this.onSocketNotification.bind(this);
@@ -116,15 +118,15 @@ class Room {
   }
 
   mute() {
-    this.isMuted = true;
+    this.muteState = true;
   }
 
   toggleMute() {
-    this.isMuted = !this.isMuted;
+    this.muteState = !this.muteState;
   }
 
   isMuted() {
-    return this.isMuted;
+    return this.muteState;
   }
 
   onSocketNotification(notification) {

@@ -55,7 +55,7 @@ class Session extends Component {
     this.room = new Room();
     this.room
       .on('room-close',() => { this.onRoomClose() })
-      .on('room-userconnect', () => { this.onUserConnect() });
+      .on('room-userconnect', (user) => { this.onUserConnect(user) });
     //TEMP
 
     this.room.join(tempurl, tempname, token)
@@ -74,11 +74,12 @@ class Session extends Component {
   }
 
   onUserConnect(user) {
+    console.debug('user', user);
     //Set up event listeners
     user
-      .on('user-disconnect', () => console.debug('Hook up user-disconnect'))
-      .on('user-addmedia', () => console.debug('Hook up user-addmedia'))
-      .on('user-removemedia', () => console.debug('Hook up user-removemedia'));
+      .on('user-disconnect', (username) => console.debug('Hook up user-disconnect'))
+      .on('user-addmedia', (username, mediakind) => console.debug('Hook up user-addmedia'))
+      .on('user-removemedia', (username, mediakind) => console.debug('Hook up user-removemedia'));
 
     //Add the user to state
     // https://lodash.com/docs/4.17.11#assign <- hoping that does what we want
@@ -115,7 +116,6 @@ class Session extends Component {
 
   render() {
     const { messages, users } = this.state;
-    console.debug('users', this.state.users);
     return (
       <div className="session">
         <div className="session-main">
@@ -123,11 +123,11 @@ class Session extends Component {
             <div className="videos">
               {
                 // Might need to change so that state update doesn't rerender all videos.
-                users.map((user) => {
+                _.map(users, (user, username) => {
                   return (
                     <Video
                       audioStream={user.audio()}
-                      key={user.name}
+                      key={username}
                       mute={() => this.room.mute(user.name)}
                       tick={() => this.room.tick(user.name)}
                       username={user.name}
