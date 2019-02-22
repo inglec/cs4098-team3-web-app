@@ -17,7 +17,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = dispatch => ({
-  onSubmitCredentials: (username, password) => dispatch(logIn(username, password)),
+  onSubmitCredentials: (uid, password) => dispatch(logIn(uid, password)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);

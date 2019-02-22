@@ -1,13 +1,13 @@
 /*
   Events:
     -- When this user disconnects
-    user-disconnect: {username}
+    user-disconnect: {uid}
 
     -- When this user adds media that we are receiving
-    user-addmedia: {username, mediakind}
+    user-addmedia: {uid, mediakind}
 
     -- When this user stops streaming to us or we stop receiving
-    user-removemedia: {username, mediakind}
+    user-removemedia: {uid, mediakind}
 
 */
 
@@ -72,7 +72,7 @@ class Peer {
   }
 
   onClose() {
-    this.emit('user-disconnect', { username: this.name });
+    this.emit('user-disconnect', { uid: this.name });
   }
 
   onNewConsumer(consumer) {
@@ -89,7 +89,7 @@ class Peer {
 
         // Emit that new media is being consumed
         this.emit('user-addmedia', {
-          username: this.name,
+          uid: this.name,
           mediakind: consumer.kind,
         });
       })
@@ -111,7 +111,7 @@ class Peer {
       }
 
       this.emit('user-removemedia', {
-        username: this.name,
+        uid: this.name,
         mediakind: consumer.kind,
       });
     });

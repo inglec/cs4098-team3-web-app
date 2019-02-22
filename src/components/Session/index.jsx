@@ -2,8 +2,8 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 
-import Room from 'app-utils/video/Room';
 import Peer from 'app-utils/video/Peer';
+import Room from 'app-utils/video/Room';
 
 import Chat from './Chat';
 import Options from './Options';
@@ -25,8 +25,8 @@ class Session extends Component {
       .on('room-close', () => this.onRoomClose())
       .on('room-userconnect', user => this.onUserConnect(user));
 
-    const { token, url, username } = props;
-    this.room.join(url, username, token)
+    const { token, uid, url } = props;
+    this.room.join(url, uid, token)
       .then(() => console.debug('joined'))
       .catch(error => console.error(error));
   }
@@ -43,12 +43,12 @@ class Session extends Component {
   onUserConnect(user) {
     // Set up event listeners
     user
-      .on('user-disconnect', username => console.debug('user-disconnect', username))
-      .on('user-addmedia', (username, mediakind) => {
-        console.debug('user-addmedia', username, mediakind);
+      .on('user-disconnect', uid => console.debug('user-disconnect', uid))
+      .on('user-addmedia', (uid, mediakind) => {
+        console.debug('user-addmedia', uid, mediakind);
       })
-      .on('user-removemedia', (username, mediakind) => {
-        console.debug('user-removemedia', username, mediakind);
+      .on('user-removemedia', (uid, mediakind) => {
+        console.debug('user-removemedia', uid, mediakind);
       });
 
     // Add user to state.
@@ -60,16 +60,16 @@ class Session extends Component {
     }));
   }
 
-  onUserDisconnect(username) {
+  onUserDisconnect(uid) {
     // Remove user from state.
     this.setState(state => ({
-      users: _.pickBy(state.users, (user, key) => key !== username),
+      users: _.pickBy(state.users, (user, key) => key !== uid),
     }));
   }
 
-  onUserAddMedia(username, mediakind) {
+  onUserAddMedia(uid, mediakind) {
     const { users } = this.state;
-    const user = users[username];
+    const user = users[uid];
 
     if (mediakind === 'video') {
       const videoStream = user.video();
@@ -82,9 +82,9 @@ class Session extends Component {
     }
   }
 
-  onUserRemoveMedia(username, mediakind) {
+  onUserRemoveMedia(uid, mediakind) {
     const { users } = this.state;
-    const user = users[username];
+    const user = users[uid];
 
     // Not sure what state change we might want here.
     if (mediakind === 'video') {
@@ -104,13 +104,15 @@ class Session extends Component {
             <div className="videos">
               {
                 // Might need to change so that state update doesn't rerender all videos.
-                _.map(users, (user, username) => (
+                _.map(users, (user, uid) => (
                   <Video
                     audioStream={user.audio()}
-                    key={username}
-                    mute={() => this.room.mute(user.name)}
+                    isMuted={user.getIsMuted()}
+                    key={uid}
+                    mute={() => this.room.toggleMute(user.name)}
+                    name={user.name}
                     tick={() => this.room.tick(user.name)}
-                    username={user.name}
+                    uid={user.id}
                     videoStream={user.video()}
                   />
                 ))
@@ -133,8 +135,8 @@ class Session extends Component {
 
 Session.propTypes = {
   token: PropTypes.string.isRequired,
+  uid: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
-  username: PropTypes.string.isRequired,
 };
 
 export default Session;

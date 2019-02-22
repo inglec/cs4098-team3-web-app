@@ -20,8 +20,9 @@ class Video extends Component {
     const {
       audioStream,
       mute,
+      name,
       tick,
-      username,
+      uid,
       videoStream,
     } = this.props;
 
@@ -36,8 +37,9 @@ class Video extends Component {
 Video.propTypes = {
   audioStream: PropTypes.object.isRequired,
   mute: PropTypes.func.isRequired,
+  name: PropTypes.string.isRequired,
   tick: PropTypes.func.isRequired,
-  username: PropTypes.string.isRequired,
+  uid: PropTypes.string.isRequired,
   videoStream: PropTypes.object.isRequired,
 };
 

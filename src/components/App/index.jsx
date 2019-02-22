@@ -27,8 +27,8 @@ const App = ({ isAuthenticated }) => (
           path="/session"
           isAuthenticated={isAuthenticated}
           component={Session}
+          uid={uuidv4()} // TODO: Change
           url={urls.videoServer} // TODO: Change
-          username={uuidv4()} // TODO: Change
         />
         <PrivateRoute path="/profile" isAuthenticated={isAuthenticated} component={Profile} />
 

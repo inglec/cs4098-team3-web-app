@@ -53,15 +53,16 @@ class Room {
     this.msRoom.on('notify', this.onRoomNotify);
   }
 
-  join(url, username, token) {
+  join(url, uid, token) {
     // Create a query
-    const query = { username, token };
+    const query = { uid, token };
+
     // Connect our local and remote room through a socket
     this.socket = io(url, { query });
     this.socket.on('mediasoup-notification', this.socketOnNotification);
 
     // Join the room
-    return this.msRoom.join(username)
+    return this.msRoom.join(uid)
       .then((otherPeers) => {
         // Create transports , TODO: see if this can be done before joining as room
         this.transports.send = this.msRoom.createTransport('send');
@@ -112,8 +113,8 @@ class Room {
     console.debug('message: ', message);
   }
 
-  tick(username) {
-    // TODO think of ticking system , username is name of person who was ticked
+  tick(uid) {
+    // TODO think of ticking system, uid is name of person who was ticked.
     console.debug('tick');
   }
 
@@ -135,8 +136,8 @@ class Room {
   }
 
   onRoomClose() {
-    // Not fully sure how much to clean up
-    // probably best to just create a new Room and close socket
+    // Not fully sure how much to clean up.
+    // Probably best to just create a new Room and close socket.
     this.emitRoomclose();
     this.socket.close();
   }
@@ -144,7 +145,7 @@ class Room {
   onRoomNewPeer(newpeer) {
     const peer = new Peer(newpeer, this);
     this.peers.set(peer.name, peer);
-    peer.on('user-disconnect', ({ username }) => this.peers.delete(username));
+    peer.on('user-disconnect', ({ uid }) => this.peers.delete(uid));
     this.emit('room-userconnect', peer);
   }
 

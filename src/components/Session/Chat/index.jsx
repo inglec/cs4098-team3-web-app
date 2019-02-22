@@ -27,7 +27,7 @@ Chat.propTypes = {
     PropTypes.exact({
       content: PropTypes.string.isRequired,
       timestamp: PropTypes.number.isRequired,
-      username: PropTypes.string.isRequired,
+      uid: PropTypes.string.isRequired,
     }),
   ).isRequired,
   sendMessage: PropTypes.func.isRequired,

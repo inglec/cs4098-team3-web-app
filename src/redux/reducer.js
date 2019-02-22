@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { combineReducers } from 'redux';
 
 import {
@@ -16,15 +17,12 @@ const createDataState = (status, data) => ({
   ...data,
 });
 
-const auth = (state = { username: 'test', token: 'testtoken' }, action) => {
+const auth = (state = { uid: 'test', token: 'testtoken' }, action) => {
   switch (action.type) {
     case LOG_IN_STARTED:
       return createDataState(LOADING);
     case LOG_IN_SUCCESS:
-      return createDataState(LOADED, {
-        username: action.username,
-        token: action.token,
-      });
+      return createDataState(LOADED, _.pick(action, ['token', 'uid']));
     case LOG_IN_FAILURE:
       return createDataState(LOADED, { error: action.error.message });
     case LOG_OUT:

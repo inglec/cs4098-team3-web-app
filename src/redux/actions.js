@@ -12,18 +12,18 @@ export const createAction = (type, fields = {}) => ({
 });
 
 // Actions.
-const logInStarted = (username, password) => createAction(LOG_IN_STARTED, { username, password });
-const logInSuccess = (username, token) => createAction(LOG_IN_SUCCESS, { username, token });
+const logInStarted = (uid, password) => createAction(LOG_IN_STARTED, { uid, password });
+const logInSuccess = (uid, token) => createAction(LOG_IN_SUCCESS, { uid, token });
 const logInFailure = error => createAction(LOG_IN_FAILURE, { error });
 
 export const logOut = () => createAction(LOG_OUT);
 
-export const logIn = (username, password) => (
+export const logIn = (uid, password) => (
   (dispatch) => {
-    dispatch(logInStarted(username, password));
+    dispatch(logInStarted(uid, password));
 
-    authenticate(username, password)
-      .then(response => dispatch(logInSuccess(username, response)))
+    authenticate(uid, password)
+      .then(response => dispatch(logInSuccess(uid, response)))
       .catch(error => dispatch(logInFailure(error)));
   }
 );
