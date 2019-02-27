@@ -19,7 +19,7 @@ class Session extends Component {
       messages: [],
       users: {},
     };
-
+    console.debug(props);
     this.room = new Room();
     this.room
       .on('room-close', () => this.onRoomClose())
@@ -41,16 +41,6 @@ class Session extends Component {
   }
 
   onUserConnect(user) {
-    // Set up event listeners
-    user
-      .on('user-disconnect', uid => console.debug('user-disconnect', uid))
-      .on('user-addmedia', (uid, mediakind) => {
-        console.debug('user-addmedia', uid, mediakind);
-      })
-      .on('user-removemedia', (uid, mediakind) => {
-        console.debug('user-removemedia', uid, mediakind);
-      });
-
     // Add user to state.
     this.setState(state => ({
       users: {
@@ -67,33 +57,6 @@ class Session extends Component {
     }));
   }
 
-  onUserAddMedia(uid, mediakind) {
-    const { users } = this.state;
-    const user = users[uid];
-
-    if (mediakind === 'video') {
-      const videoStream = user.video();
-
-      // TODO: Do something with the video.
-    } else if (mediakind === 'audio') {
-      const audioStream = user.audio();
-
-      // TODO: Do something with the audio.
-    }
-  }
-
-  onUserRemoveMedia(uid, mediakind) {
-    const { users } = this.state;
-    const user = users[uid];
-
-    // Not sure what state change we might want here.
-    if (mediakind === 'video') {
-      // TODO
-    } else if (mediakind === 'audio') {
-      // TODO
-    }
-  }
-
   getClient() {
     const { token, uid, url } = this.props;
     return { token, uid, url };
@@ -108,17 +71,13 @@ class Session extends Component {
           <div className="videos-container">
             <div className="videos">
               {
-                // Might need to change so that state update doesn't rerender all videos.
+                // Might be easier to just make user a prop of Video
                 _.map(users, (user, uid) => (
                   <Video
-                    audioStream={user.audio()}
-                    isMuted={user.getIsMuted()}
+                    user={user}
                     key={uid}
-                    mute={() => this.room.toggleMute(user.name)}
-                    name={user.name}
-                    tick={() => this.room.tick(user.name)}
-                    uid={user.id}
-                    videoStream={user.video()}
+                    name={user.uid}
+                    uid={user.uid}
                   />
                 ))
               }

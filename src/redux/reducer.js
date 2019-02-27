@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { combineReducers } from 'redux';
+import uuidv4 from 'uuid/v4';
 
 import {
   LOG_IN_FAILURE,
@@ -17,7 +18,8 @@ const createDataState = (status, data) => ({
   ...data,
 });
 
-const auth = (state = { uid: 'test', token: 'testtoken' }, action) => {
+// TODO: re-adjust uid to be null until logged in
+const auth = (state = { uid: uuidv4(), token: 'testtoken' }, action) => {
   switch (action.type) {
     case LOG_IN_STARTED:
       return createDataState(LOADING);

@@ -3,12 +3,28 @@ import React, { Component } from 'react';
 
 import './styles';
 
+/*
+  https://www.w3.org/TR/mediacapture-streams/#mediastreamtrack
+  MediaStreams
+*/
+
 class Video extends Component {
   constructor(props) {
     super(props);
 
     this.audioRef = React.createRef();
     this.videoRef = React.createRef();
+    this.user = props.user;
+
+    this.user.on('user-addmedia', (media) => {
+      if (media.mediakind === 'video') {
+        this.videoRef.current.srcObject = media.mediastream;
+      }
+    });
+
+    this.user.on('user-removemedia', (obj) => {
+
+    });
   }
 
   componentDidMount() {
@@ -17,30 +33,19 @@ class Video extends Component {
   }
 
   render() {
-    const {
-      audioStream,
-      mute,
-      name,
-      tick,
-      uid,
-      videoStream,
-    } = this.props;
-
     return (
-      <video className="video" ref={this.videoRef}>
-        <source src={videoStream} />
-      </video>
+      <video ref={this.videoRef}
+        className='video'
+        autoPlay
+      />
     );
   }
 }
 
 Video.propTypes = {
-  audioStream: PropTypes.object.isRequired,
-  mute: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
   name: PropTypes.string.isRequired,
-  tick: PropTypes.func.isRequired,
   uid: PropTypes.string.isRequired,
-  videoStream: PropTypes.object.isRequired,
 };
 
 export default Video;

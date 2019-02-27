@@ -4,7 +4,7 @@
     user-disconnect: {uid}
 
     -- When this user adds media that we are receiving
-    user-addmedia: {uid, mediakind}
+    user-addmedia: {uid, mediakind, mediastream}
 
     -- When this user stops streaming to us or we stop receiving
     user-removemedia: {uid, mediakind}
@@ -14,8 +14,10 @@
 class Peer {
   constructor(msPeer, room) {
     this.msPeer = msPeer;
-    this.name = msPeer.name;
+    this.uid = msPeer.name; // Mediasoup refer to it as name
+    this.muted = false;
     this.room = room;
+
     this.consumers = {
       video: null,
       audio: null,
@@ -54,6 +56,18 @@ class Peer {
     return null;
   }
 
+  toggleMute() {
+    this.muted = !this.muted;
+  }
+
+  isMuted() {
+    return this.muted;
+  }
+
+  tick() {
+    console.debug(`User ${this.uid} was ticked`);
+  }
+
   on(eventname, callback) {
     if (Array.isArray(this.listeners[eventname])) {
       this.listeners[eventname].push(callback);
@@ -78,19 +92,23 @@ class Peer {
   onNewConsumer(consumer) {
     // Recieve the new consumer
     consumer.receive(this.room.transports.recv)
-      .then(() => {
+      .then((track) => {
         // Add reference to this consumer
         if (consumer.kind === 'audio') {
           this.consumers.audio = consumer;
         }
         if (consumer.kind === 'video') {
-          this.consumers.video = consumer;
+          this.consumers.audio = consumer;
         }
 
         // Emit that new media is being consumed
+        const stream = new MediaStream();
+        stream.addTrack(track);
+
         this.emit('user-addmedia', {
-          uid: this.name,
+          uid: this.uid,
           mediakind: consumer.kind,
+          mediastream: stream,
         });
       })
       .catch((error) => {

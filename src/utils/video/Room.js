@@ -25,7 +25,7 @@ class Room {
     this.msRoom = new MediasoupRoom();
     this.peers = new Map();
     this.socket = null;
-    this.muteState = false;
+    this.muted = false;
     this.transports = {
       send: null,
       recv: null,
@@ -114,21 +114,12 @@ class Room {
     console.debug('message: ', message);
   }
 
-  tick(uid) {
-    // TODO think of ticking system, uid is name of person who was ticked.
-    console.debug('tick');
-  }
-
-  mute() {
-    this.muteState = true;
-  }
-
   toggleMute() {
-    this.muteState = !this.muteState;
+    this.muted = !this.muted;
   }
 
   isMuted() {
-    return this.muteState;
+    return this.muted;
   }
 
   onSocketNotification(notification) {
@@ -145,7 +136,7 @@ class Room {
 
   onRoomNewPeer(newpeer) {
     const peer = new Peer(newpeer, this);
-    this.peers.set(peer.name, peer);
+    this.peers.set(peer.uid, peer);
     peer.on('user-disconnect', ({ uid }) => this.peers.delete(uid));
     this.emit('room-userconnect', peer);
   }
