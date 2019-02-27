@@ -53,8 +53,9 @@ class Room {
     this.msRoom.on('notify', this.onRoomNotify);
   }
 
-  join(url, uid, token) {
+  join(client) {
     // Create a query
+    const { url, uid, token } = client;
     const query = { uid, token };
 
     // Connect our local and remote room through a socket

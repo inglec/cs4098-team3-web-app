@@ -25,8 +25,8 @@ class Session extends Component {
       .on('room-close', () => this.onRoomClose())
       .on('room-userconnect', user => this.onUserConnect(user));
 
-    const { token, uid, url } = props;
-    this.room.join(url, uid, token)
+    const client = this.getClient();
+    this.room.join(client)
       .then(() => console.debug('joined'))
       .catch(error => console.error(error));
   }
@@ -94,6 +94,11 @@ class Session extends Component {
     }
   }
 
+  getClient() {
+    const { token, uid, url } = this.props;
+    return { token, uid, url };
+  }
+
   render() {
     const { messages, users } = this.state;
 
@@ -123,6 +128,9 @@ class Session extends Component {
             isMuted={this.room.isMuted()}
             toggleMute={() => this.room.toggleMute()}
           />
+
+          // Development Purposes
+
         </div>
         <Chat
           messages={messages}
