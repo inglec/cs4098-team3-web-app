@@ -23,19 +23,30 @@ class Video extends Component {
       if (media.mediakind === 'video') {
         this.videoRef.current.srcObject = media.mediastream;
       }
+      if (media.mediakind === 'audio') {
+        this.audioRef.current.srcObject = media.mediastream;
+      }
     });
 
     this.user.on('user-removemedia', (obj) => {
-      console.debug('User removed ', obj);
+      // Unmount component, maybe some extra stuff
     });
   }
 
   render() {
     return (
-      <video ref={this.videoRef}
-        className='video'
-        autoPlay
-      />
+      <div className="user-media">
+        <video
+          ref={this.videoRef}
+          className="video"
+          autoPlay
+        />
+        <audio
+          ref={this.audioRef}
+          className="audio"
+          autoPlay
+        />
+      </div>
     );
   }
 }
