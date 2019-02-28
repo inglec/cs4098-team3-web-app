@@ -16,6 +16,9 @@ class Video extends Component {
     this.videoRef = React.createRef();
     this.user = props.user;
 
+    /*
+      media = {uid, mediakind, mediastream}
+    */
     this.user.on('user-addmedia', (media) => {
       if (media.mediakind === 'video') {
         this.videoRef.current.srcObject = media.mediastream;
@@ -23,13 +26,8 @@ class Video extends Component {
     });
 
     this.user.on('user-removemedia', (obj) => {
-
+      console.debug('User removed ', obj);
     });
-  }
-
-  componentDidMount() {
-    // this.audioRef.current.play();
-    // this.videoRef.current.play();
   }
 
   render() {

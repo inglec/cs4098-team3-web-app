@@ -86,7 +86,8 @@ class Peer {
   }
 
   onClose() {
-    this.emit('user-disconnect', { uid: this.name });
+    console.debug(`${this.uid} has closed their connection`)
+    this.emit('user-disconnect', { uid: this.uid });
   }
 
   onNewConsumer(consumer) {
@@ -129,7 +130,7 @@ class Peer {
       }
 
       this.emit('user-removemedia', {
-        uid: this.name,
+        uid: this.uid,
         mediakind: consumer.kind,
       });
     });

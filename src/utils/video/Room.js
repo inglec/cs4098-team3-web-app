@@ -48,7 +48,7 @@ class Room {
 
     // Establish callback for notifications through socket
     this.socket.on('mediasoup-notification', (notification) => {
-      this.socketOnNotification(notification);
+      this.onSocketNotification(notification);
     });
 
     // Join the room
@@ -130,6 +130,8 @@ class Room {
     // Set up callback and for when 'user-disconnect' and emit 'room-userconenct'
     peer.on('user-disconnect', ({ uid }) => this.peers.delete(uid));
     this.emit('room-userconnect', peer);
+
+    console.debug(`new peer has joined : ${peer.uid}`)
   }
 
   onRoomRequest(request, callback, errback) {

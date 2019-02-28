@@ -42,10 +42,11 @@ class Session extends Component {
 
   onUserConnect(user) {
     // Add user to state.
+    console.debug(user);
     this.setState(state => ({
       users: {
         ...state.users,
-        [user.name]: user,
+        [user.uid]: user,
       },
     }));
   }
@@ -76,8 +77,8 @@ class Session extends Component {
                   <Video
                     user={user}
                     key={uid}
-                    name={user.uid}
-                    uid={user.uid}
+                    name={uid}
+                    uid={uid}
                   />
                 ))
               }
