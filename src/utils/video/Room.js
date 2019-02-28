@@ -34,7 +34,7 @@ class Room {
     // Connect event listeners
     this.msRoom.on('close', () => this.onRoomClose());
     this.msRoom.on('newpeer', mediasoupPeer => this.onRoomNewPeer(mediasoupPeer));
-    this.msRoom.on('request', ...args => this.onRoomRequest(...args));
+    this.msRoom.on('request', (request, callback, errback) => this.onRoomRequest(request, callback, errback));
     this.msRoom.on('notify', notification => this.onRoomNotify(notification));
   }
 
