@@ -1,8 +1,9 @@
+/* eslint-disable react/no-unused-prop-types */
+
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 
-import Peer from 'app-utils/video/Peer';
 import Room from 'app-utils/video/Room';
 
 import Chat from './Chat';
@@ -19,16 +20,14 @@ class Session extends Component {
       messages: [],
       users: {},
     };
-    console.debug(props);
+
     this.room = new Room();
     this.room
       .on('room-close', () => this.onRoomClose())
       .on('room-userconnect', user => this.onUserConnect(user));
 
     const client = this.getClient();
-    this.room.join(client)
-      .then(() => console.debug('joined'))
-      .catch(error => console.error(error));
+    this.room.join(client);
   }
 
   componentWillUnmount() {
@@ -36,31 +35,35 @@ class Session extends Component {
   }
 
   onRoomClose() {
-    console.debug('Closing room');
     this.setState({ users: {} });
   }
 
   onUserConnect(user) {
-    // Add user to state.
-    console.debug(user);
+    // Add user to state
     this.setState(state => ({
       users: {
         ...state.users,
         [user.uid]: user,
       },
     }));
+
+    this.setState(state => ({
+      users: {
+        ...state.users,
+        [user.uid]: _.pickBy(user, (value, key) => key !== 'uid'),
+      },
+    }));
   }
 
   onUserDisconnect(uid) {
-    // Remove user from state.
+    // Remove user from state
     this.setState(state => ({
       users: _.pickBy(state.users, (user, key) => key !== uid),
     }));
   }
 
   getClient() {
-    const { token, uid, url } = this.props;
-    return { token, uid, url };
+    return _.pick(this.props, ['token', 'uid', 'url']);
   }
 
   render() {
@@ -72,13 +75,13 @@ class Session extends Component {
           <div className="videos-container">
             <div className="videos">
               {
-                // Might be easier to just make user a prop of Video
+                // TODO: Make event names constant in external file
                 _.map(users, (user, uid) => (
                   <Video
-                    user={user}
                     key={uid}
-                    name={uid}
                     uid={uid}
+                    onUserAddMedia={callback => user.on('user-addmedia', callback)}
+                    onUserRemoveMedia={callback => user.on('user-removemedia', callback)}
                   />
                 ))
               }
@@ -88,9 +91,6 @@ class Session extends Component {
             isMuted={this.room.isMuted()}
             toggleMute={() => this.room.toggleMute()}
           />
-
-          // Development Purposes
-
         </div>
         <Chat
           messages={messages}
