@@ -1,10 +1,14 @@
-/* eslint-disable react/no-unused-prop-types */
-
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 
 import Room from 'app-utils/video/Room';
+import {
+  ROOM_CLOSE,
+  ROOM_USER_CONNECT,
+  USER_ADD_MEDIA,
+  USER_REMOVE_MEDIA,
+} from 'app-utils/video/events';
 
 import Chat from './Chat';
 import Options from './Options';
@@ -23,11 +27,12 @@ class Session extends Component {
 
     this.room = new Room();
     this.room
-      .on('room-close', () => this.onRoomClose())
-      .on('room-userconnect', user => this.onUserConnect(user));
+      .on(ROOM_CLOSE, () => this.onRoomClose())
+      .on(ROOM_USER_CONNECT, user => this.onUserConnect(user));
 
-    const client = this.getClient();
-    this.room.join(client);
+    const { token, uid, url } = this.props;
+
+    this.room.join(url, uid, token);
   }
 
   componentWillUnmount() {
@@ -46,13 +51,6 @@ class Session extends Component {
         [user.uid]: user,
       },
     }));
-
-    this.setState(state => ({
-      users: {
-        ...state.users,
-        [user.uid]: _.pickBy(user, (value, key) => key !== 'uid'),
-      },
-    }));
   }
 
   onUserDisconnect(uid) {
@@ -60,10 +58,6 @@ class Session extends Component {
     this.setState(state => ({
       users: _.pickBy(state.users, (user, key) => key !== uid),
     }));
-  }
-
-  getClient() {
-    return _.pick(this.props, ['token', 'uid', 'url']);
   }
 
   render() {
@@ -80,15 +74,15 @@ class Session extends Component {
                   <Video
                     key={uid}
                     uid={uid}
-                    onUserAddMedia={callback => user.on('user-addmedia', callback)}
-                    onUserRemoveMedia={callback => user.on('user-removemedia', callback)}
+                    onUserAddMedia={callback => user.on(USER_ADD_MEDIA, callback)}
+                    onUserRemoveMedia={callback => user.on(USER_REMOVE_MEDIA, callback)}
                   />
                 ))
               }
             </div>
           </div>
           <Options
-            isMuted={this.room.isMuted()}
+            isMuted={this.room.isMuted}
             toggleMute={() => this.room.toggleMute()}
           />
         </div>

@@ -1,69 +1,64 @@
-import io from 'socket.io-client';
 import { Room as MediasoupRoom } from 'mediasoup-client';
+import io from 'socket.io-client';
 
+import {
+  CLOSE,
+  NEW_PEER,
+  MEDIASOUP_NOTIFICATION,
+  MEDIASOUP_REQUEST,
+  NOTIFY,
+  REQUEST,
+  ROOM_CLOSE,
+  ROOM_USER_CONNECT,
+  USER_DISCONNECT,
+} from './events';
 import Peer from './Peer';
-/*
-  Events:
-    -- When the room closes (locally or remotely)
-    room-close: {}
-
-    -- When a new user joins the room
-    room-userconnect: {user}
-
-    => See Peer.js for events that can be listened for on object 'user'
-*/
 
 class Room {
   constructor() {
-    // super();
     this.msRoom = new MediasoupRoom();
     this.peers = new Map();
     this.socket = null;
-    this.muted = false;
-    this.transports = {
-      send: null,
-      recv: null,
-    };
+    this.isMuted = false;
+    this.transports = { recv: null, send: null };
 
-    // Events that can listened for
+    // Events that can be listened for
     this.listeners = {
-      'room-close': [],
-      'room-userconnect': [],
+      [ROOM_CLOSE]: [],
+      [ROOM_USER_CONNECT]: [],
     };
 
     // Connect event listeners
-    this.msRoom.on('close', () => this.onRoomClose());
-    this.msRoom.on('newpeer', mediasoupPeer => this.onRoomNewPeer(mediasoupPeer));
-    this.msRoom.on('request', (request, callback, errback) => this.onRoomRequest(request, callback, errback));
-    this.msRoom.on('notify', notification => this.onRoomNotify(notification));
+    this.msRoom.on(CLOSE, () => this.onRoomClose());
+    this.msRoom.on(NEW_PEER, mediasoupPeer => this.onRoomNewPeer(mediasoupPeer));
+    this.msRoom.on(NOTIFY, notification => this.onRoomNotify(notification));
+    this.msRoom.on(REQUEST, (request, callback, errback) => (
+      this.onRoomRequest(request, callback, errback)
+    ));
   }
 
-  join(client) {
-    // Create a query
-    const { url, uid, token } = client;
-    const query = { uid, token };
-
+  join(url, uid, token) {
     // Connect our local and remote room through a socket
-    this.socket = io(url, { query });
-
-    // Establish callback for notifications through socket
-    this.socket.on('mediasoup-notification', (notification) => {
-      this.onSocketNotification(notification);
-    });
+    this.socket = io(url, { query: { uid, token } });
+    this.socket.on(MEDIASOUP_NOTIFICATION, notification => (
+      this.msRoom.receiveNotification(notification)
+    ));
 
     // Join the room
     return this.msRoom.join(uid)
-      .then((otherPeers) => {
-        // Create transports , TODO: see if this can be done before joining as room
-        this.transports.send = this.msRoom.createTransport('send');
-        this.transports.recv = this.msRoom.createTransport('recv');
+      .then((peers) => {
+        this.transports = {
+          recv: this.msRoom.createTransport('recv'),
+          send: this.msRoom.createTransport('send'),
+        };
 
         // Setup all the handles for every other peer already in the room
-        otherPeers.forEach(mediasoupPeer => this.onRoomNewPeer(mediasoupPeer));
-
-        // Get our user media as a promise
-        return navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+        peers.forEach(peer => this.onRoomNewPeer(peer));
       })
+      .then(() => (
+        // Get our user media as a promise
+        navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+      ))
       .then((mediastream) => {
         // Create producers for both video and audio
         const audio = mediastream.getAudioTracks()[0];
@@ -81,74 +76,58 @@ class Room {
     this.msRoom.leave();
   }
 
-  on(eventname, callback) {
-    if (Array.isArray(this.listeners[eventname])) {
-      this.listeners[eventname].push(callback);
-    } else {
-      console.debug('Unrecognized event for Peer : ', eventname);
+  on(eventName, callback) {
+    if (eventName in this.listeners) {
+      this.listeners[eventName].push(callback);
     }
     return this;
   }
 
-  emit(eventname, obj) {
-    if (Array.isArray(this.listeners[eventname])) {
-      this.listeners[eventname].forEach(cb => cb(obj));
-    } else {
-      console.debug('Unrecognized event for Peer : ', eventname);
+  emit(eventName, ...args) {
+    if (eventName in this.listeners) {
+      this.listeners[eventName].forEach(callback => callback(...args));
     }
   }
 
+  // eslint-disable-next-line
   sendMessage(message) {
     // TODO
-    console.debug('message: ', message);
   }
 
   toggleMute() {
-    this.muted = !this.muted;
-  }
+    this.isMuted = !this.isMuted;
 
-  isMuted() {
-    return this.muted;
-  }
-
-  onSocketNotification(notification) {
-    console.debug('Notification recieved:', notification);
-    this.msRoom.receiveNotification(notification);
+    return this.isMuted;
   }
 
   onRoomClose() {
     // Probably best to just close socket and create a new Room if needed
-    this.emitRoomclose();
+    // this.emitRoomClose();
     this.socket.close();
   }
 
-  onRoomNewPeer(newpeer) {
+  onRoomNewPeer(mediasoupPeer) {
     // Create a new peer and add it to the list
-    const peer = new Peer(newpeer, this);
+    const peer = new Peer(mediasoupPeer, this.transports);
     this.peers.set(peer.uid, peer);
 
-    // Set up callback and for when 'user-disconnect' and emit 'room-userconenct'
-    peer.on('user-disconnect', ({ uid }) => this.peers.delete(uid));
-    this.emit('room-userconnect', peer);
-
-    console.debug(`new peer has joined : ${peer.uid}`)
+    // Set up callback and for when 'user-disconnect' and emit 'room-userconnect'
+    peer.on(USER_DISCONNECT, user => this.peers.delete(user.uid));
+    this.emit(ROOM_USER_CONNECT, peer);
   }
 
   onRoomRequest(request, callback, errback) {
-    console.debug('Request sent:', request);
-    this.socket.emit('mediasoup-request', request, (err, response) => {
+    this.socket.emit(MEDIASOUP_REQUEST, request, (err, response) => {
       if (err) {
-        console.debug('Error recieved from request:', err);
         errback(err);
       } else {
-        console.debug('Response recieved from request:', response);
         callback(response);
       }
     });
   }
 
   onRoomNotify(notification) {
-    this.socket.emit('mediasoup-notification', notification);
+    this.socket.emit(MEDIASOUP_NOTIFICATION, notification);
   }
 }
 
