@@ -1,0 +1,51 @@
+Socket:
+    type: LISTEN
+    name: 'mediasoup-notifcation'
+    when: Created when remote Room has something to notify us with
+    action: Should notify the local room of the new notifcation in
+
+    type: EMIT
+    name: 'mediasoup-notifcation'
+    when: Emitted when local room needs to notify remote room
+    action: null;
+
+    type: EMIT
+    name: 'mediasoup-request'
+    when: Emitted when the local room needs to request from remote room
+    action: Relay the response from the remote room to the lcoal room once its
+      received;
+
+Room: LISTEN
+  name: 'request'
+  when: Local room will emit this when it has a request to make of the remote
+    room
+  action: Relay this through the socket and return the response
+
+  name: 'notify'
+  when: Local room will emit this when it needs to notify the remote room
+  action: Relay this through the socket
+
+  name: 'close'
+  when: Local room will emit this when the room is close our peer leaves
+  action: Emit our own event letting app know the room has closed
+
+  name: 'newpeer'
+  when: Local room will emit this when a new peer joins the remote room
+  action: Add the peer and their media
+
+Peer: LISTEN
+  name: 'close'
+  when: Emitted when the remote peer is closed or leaves the room
+  action: Emit our own event letting app know what peer has left
+
+  name: 'newconsumer'
+  when: Emitted when a consumer for a remote peers media is Created
+    (If a remote peer creates a new producer, it will fire newconsumer on all
+    other remote peers)
+  action: Set up handles for the new consumer and inform the app of a new media
+    stream incoming
+
+Consumer: LISTEN
+  name: 'close'
+  when: Emitted when a consumer is closed locally or the remote producer ends
+  action: Inform the app that we have no longer have access to the media
