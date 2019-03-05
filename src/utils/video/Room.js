@@ -60,15 +60,31 @@ class Room {
         navigator.mediaDevices.getUserMedia({ audio: true, video: true })
       ))
       .then((mediastream) => {
-        // Create producers for both video and audio
-        const audio = mediastream.getAudioTracks()[0];
-        const video = mediastream.getVideoTracks()[0];
-        const audioProducer = this.msRoom.createProducer(audio);
-        const videoProducer = this.msRoom.createProducer(video);
+        // Create references to mediastreams which may be assigned to if tracks exist
+        let audioStream = null;
+        let videoStream = null;
 
-        // Send our produced video over send transport to the remote room
-        audioProducer.send(this.transports.send);
-        videoProducer.send(this.transports.send);
+        const audioTracks = mediastream.getAudioTracks();
+        const videoTracks = mediastream.getVideoTracks();
+        // Process audio and video tracks if any
+        // https://stackoverflow.com/questions/24403732/check-if-array-is-empty-or-does-not-exist-js
+        if (Array.isArray(audioTracks) && audioTracks.length) {
+          const audio = mediastream.getAudioTracks()[0];
+          const audioProducer = this.msRoom.createProducer(audio);
+          audioProducer.send(this.transports.send);
+          audioStream = new MediaStream();
+          audioStream.addTrack(audio);
+        }
+
+        if (Array.isArray(videoTracks) && videoTracks.length) {
+          const video = mediastream.getVideoTracks()[0];
+          const videoProducer = this.msRoom.createProducer(video);
+          videoProducer.send(this.transports.send);
+          videoStream = new MediaStream();
+          videoStream.addTrack(video);
+        }
+
+        return Promise.resolve({ audioStream, videoStream });
       });
   }
 

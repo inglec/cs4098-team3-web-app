@@ -25,6 +25,13 @@ class Session extends Component {
       users: {},
     };
 
+    // Didn't put into state as we might not want to rerender whole page if
+    // media cuts out
+    this.ownAudioRef = React.createRef();
+    this.ownVideoRef = React.createRef();
+    this.ownAudioStream = null;
+    this.ownVideoStream = null;
+
     this.room = new Room();
     this.room
       .on(ROOM_CLOSE, () => this.onRoomClose())
@@ -32,7 +39,18 @@ class Session extends Component {
 
     const { token, uid, url } = this.props;
 
-    this.room.join(url, uid, token);
+    this.room.join(url, uid, token)
+      .then(({ audioStream, videoStream }) => {
+        this.ownAudioStream = audioStream;
+        this.ownVideoStream = videoStream;
+        // Refs may not have been set if not rendered yet
+        this.tryMountOwnMedia();
+      });
+  }
+
+  componentDidMount() {
+    // Media elements may not have been retrieved before render
+    this.tryMountOwnMedia();
   }
 
   componentWillUnmount() {
@@ -60,6 +78,16 @@ class Session extends Component {
     }));
   }
 
+  tryMountOwnMedia() {
+    // Check if both the ref has been created and the media has been gotten
+    if (this.ownAudioStream && this.ownAudioRef.current) {
+      this.ownAudioRef.current.srcObject = this.ownAudioStream;
+    }
+    if (this.ownVideoStream && this.ownVideoRef.current) {
+      this.ownVideoRef.current.srcObject = this.ownVideoStream;
+    }
+  }
+
   render() {
     const { messages, users } = this.state;
 
@@ -68,6 +96,7 @@ class Session extends Component {
         <div className="session-main">
           <div className="videos-container">
             <div className="videos">
+
               {
                 // TODO: Make event names constant in external file
                 _.map(users, (user, uid) => (
@@ -79,6 +108,12 @@ class Session extends Component {
                   />
                 ))
               }
+
+              <div className="own-media-container">
+                <audio className="audio" autoPlay ref={this.ownAudioRef} />
+                <video className="video" autoPlay ref={this.ownVideoRef} />
+              </div>
+
             </div>
           </div>
           <Options
