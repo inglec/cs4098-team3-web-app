@@ -1,5 +1,6 @@
 {
   "urls": {
-    "videoServer": "http://localhost:8081"
+    "local": "localhost:8081",
+    "remote": "ec2-34-255-199-16.eu-west-1.compute.amazonaws.com:48081"
   }
 }
