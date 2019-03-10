@@ -1,139 +1,116 @@
-/*
-  Events:
-    -- When this user disconnects
-    user-disconnect: {uid}
-
-    -- When this user adds media that we are receiving
-    user-addmedia: {uid, mediakind, mediastream}
-
-    -- When this user stops streaming to us or we stop receiving
-    user-removemedia: {uid, mediakind}
-
-*/
+import {
+  CLOSE,
+  NEW_CONSUMER,
+  USER_ADD_MEDIA,
+  USER_DISCONNECT,
+  USER_REMOVE_MEDIA,
+} from './events';
 
 class Peer {
-  constructor(msPeer, room) {
+  constructor(msPeer, roomTransports) {
     this.msPeer = msPeer;
-    this.uid = msPeer.name; // Mediasoup refer to it as name
-    this.muted = false;
-    this.room = room;
-
-    this.consumers = {
-      video: null,
-      audio: null,
-    };
+    this.uid = msPeer.name; // Mediasoup refers to it as `name`
+    this.consumers = { audio: null, video: null };
+    this.roomTransports = roomTransports;
+    this.isMuted = false;
 
     // Events that can be listened for
     this.listeners = {
-      'user-disconnect': [],
-      'user-addmedia': [],
-      'user-removemedia': [],
+      [USER_ADD_MEDIA]: [],
+      [USER_DISCONNECT]: [],
+      [USER_REMOVE_MEDIA]: [],
     };
 
-    // Binding
-    this.onClose = this.onClose.bind(this);
-    this.onNewConsumer = this.onNewConsumer.bind(this);
-
     // Setup event handlers
-    this.msPeer.on('close', this.onClose);
-    this.msPeer.on('newconsumer', this.onNewConsumer);
+    this.msPeer.on(CLOSE, () => this.onClose());
+    this.msPeer.on(NEW_CONSUMER, consumer => this.onNewConsumer(consumer));
 
-    // Setup all consumer for this peer
+    // Setup all consumers for this peer
     this.msPeer.consumers.forEach(consumer => this.onNewConsumer(consumer));
   }
 
-  audio() {
-    if (this.consumers.audio) {
-      return this.consumers.video.audio;
-    }
-    return null;
-  }
-
-  video() {
-    if (this.consumers.video) {
-      return this.consumers.video.track;
-    }
-    return null;
-  }
-
   toggleMute() {
-    this.muted = !this.muted;
+    this.isMuted = !this.isMuted;
+
+    // Return the new muted status
+    return this.isMuted;
   }
 
-  isMuted() {
-    return this.muted;
-  }
-
+  // eslint-disable-next-line
   tick() {
-    console.debug(`User ${this.uid} was ticked`);
+    // TODO
   }
 
-  on(eventname, callback) {
-    if (Array.isArray(this.listeners[eventname])) {
-      this.listeners[eventname].push(callback);
-    } else {
-      console.debug('Unrecognized event for Peer : ', eventname);
+  on(eventName, callback) {
+    if (eventName in this.listeners) {
+      this.listeners[eventName].push(callback);
     }
+
+    // Allow chaining
     return this;
   }
 
-  emit(eventname, obj) {
-    if (Array.isArray(this.listeners[eventname])) {
-      this.listeners[eventname].forEach(cb => cb(obj));
-    } else {
-      console.debug('Unrecognized event for Peer : ', eventname);
+  emit(eventName, ...args) {
+    if (eventName in this.listeners) {
+      this.listeners[eventName].forEach(callback => callback(...args));
     }
   }
 
   onClose() {
-    console.debug(`${this.uid} has closed their connection`)
-    this.emit('user-disconnect', { uid: this.uid });
+    this.emit(USER_DISCONNECT, { uid: this.uid });
   }
 
   onNewConsumer(consumer) {
-    // Recieve the new consumer
-    consumer.receive(this.room.transports.recv)
+    // Receive the new consumer
+    consumer.receive(this.roomTransports.recv)
       .then((track) => {
         // Add reference to this consumer
-        if (consumer.kind === 'audio') {
-          this.consumers.audio = consumer;
-        }
-        if (consumer.kind === 'video') {
-          this.consumers.audio = consumer;
+        switch (track.kind) {
+          case 'audio':
+            this.consumers.audio = track;
+            break;
+          case 'video':
+            this.consumers.video = track;
+            break;
+          default:
         }
 
         // Emit that new media is being consumed
         const stream = new MediaStream();
         stream.addTrack(track);
 
-        this.emit('user-addmedia', {
+        this.emit(USER_ADD_MEDIA, {
           uid: this.uid,
-          mediakind: consumer.kind,
+          mediakind: track.kind,
           mediastream: stream,
         });
-      })
-      .catch((error) => {
-        // TODO: Document the error a little more
-        console.error(error);
       });
 
-    consumer.on('close', (originator) => {
-      console.debug(`consumer closed for ${consumer.peer.name} from ${originator}`);
-
+    consumer.on(CLOSE, () => {
       // Remove reference to this consumer
-      if (consumer.kind === 'audio') {
-        this.consumers.audio = null;
+      switch (consumer.kind) {
+        case 'audio':
+          this.consumers.audio = null;
+          break;
+        case 'video':
+          this.consumers.video = null;
+          break;
+        default:
       }
 
-      if (consumer.kind === 'video') {
-        this.consumers.video = null;
-      }
-
-      this.emit('user-removemedia', {
+      this.emit(USER_REMOVE_MEDIA, {
         uid: this.uid,
         mediakind: consumer.kind,
       });
     });
+  }
+
+  get audio() {
+    return this.consumers.audio;
+  }
+
+  get video() {
+    return this.consumers.video;
   }
 }
 

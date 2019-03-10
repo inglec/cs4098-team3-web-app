@@ -28,7 +28,7 @@ const App = ({ isAuthenticated }) => (
           isAuthenticated={isAuthenticated}
           component={Session}
           uid={uuidv4()} // TODO: Not working, redux mapStateto props is overiding this anyway
-          url={urls.videoServer} // TODO: Change
+          url={urls.remote} // TODO: Change
         />
         <PrivateRoute path="/profile" isAuthenticated={isAuthenticated} component={Profile} />
 

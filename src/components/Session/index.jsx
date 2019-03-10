@@ -1,10 +1,14 @@
-/* eslint-disable react/no-unused-prop-types */
-
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 
 import Room from 'app-utils/video/Room';
+import {
+  ROOM_CLOSE,
+  ROOM_USER_CONNECT,
+  USER_ADD_MEDIA,
+  USER_REMOVE_MEDIA,
+} from 'app-utils/video/events';
 
 import Chat from './Chat';
 import Options from './Options';
@@ -21,13 +25,32 @@ class Session extends Component {
       users: {},
     };
 
+    // Didn't put into state as we might not want to rerender whole page if
+    // media cuts out
+    this.ownAudioRef = React.createRef();
+    this.ownVideoRef = React.createRef();
+    this.ownAudioStream = null;
+    this.ownVideoStream = null;
+
     this.room = new Room();
     this.room
-      .on('room-close', () => this.onRoomClose())
-      .on('room-userconnect', user => this.onUserConnect(user));
+      .on(ROOM_CLOSE, () => this.onRoomClose())
+      .on(ROOM_USER_CONNECT, user => this.onUserConnect(user));
 
-    const client = this.getClient();
-    this.room.join(client);
+    const { token, uid, url } = this.props;
+
+    this.room.join(url, uid, token)
+      .then(({ audioStream, videoStream }) => {
+        this.ownAudioStream = audioStream;
+        this.ownVideoStream = videoStream;
+        // Refs may not have been set if not rendered yet
+        this.tryMountOwnMedia();
+      });
+  }
+
+  componentDidMount() {
+    // Media elements may not have been retrieved before render
+    this.tryMountOwnMedia();
   }
 
   componentWillUnmount() {
@@ -46,13 +69,6 @@ class Session extends Component {
         [user.uid]: user,
       },
     }));
-
-    this.setState(state => ({
-      users: {
-        ...state.users,
-        [user.uid]: _.pickBy(user, (value, key) => key !== 'uid'),
-      },
-    }));
   }
 
   onUserDisconnect(uid) {
@@ -62,8 +78,14 @@ class Session extends Component {
     }));
   }
 
-  getClient() {
-    return _.pick(this.props, ['token', 'uid', 'url']);
+  tryMountOwnMedia() {
+    // Check if both the ref has been created and the media has been gotten
+    if (this.ownAudioStream && this.ownAudioRef.current) {
+      this.ownAudioRef.current.srcObject = this.ownAudioStream;
+    }
+    if (this.ownVideoStream && this.ownVideoRef.current) {
+      this.ownVideoRef.current.srcObject = this.ownVideoStream;
+    }
   }
 
   render() {
@@ -74,21 +96,28 @@ class Session extends Component {
         <div className="session-main">
           <div className="videos-container">
             <div className="videos">
+
               {
                 // TODO: Make event names constant in external file
                 _.map(users, (user, uid) => (
                   <Video
                     key={uid}
                     uid={uid}
-                    onUserAddMedia={callback => user.on('user-addmedia', callback)}
-                    onUserRemoveMedia={callback => user.on('user-removemedia', callback)}
+                    onUserAddMedia={callback => user.on(USER_ADD_MEDIA, callback)}
+                    onUserRemoveMedia={callback => user.on(USER_REMOVE_MEDIA, callback)}
                   />
                 ))
               }
+
+              <div className="own-media-container">
+                <audio className="audio" autoPlay ref={this.ownAudioRef} />
+                <video className="video" autoPlay ref={this.ownVideoRef} />
+              </div>
+
             </div>
           </div>
           <Options
-            isMuted={this.room.isMuted()}
+            isMuted={this.room.isMuted}
             toggleMute={() => this.room.toggleMute()}
           />
         </div>
