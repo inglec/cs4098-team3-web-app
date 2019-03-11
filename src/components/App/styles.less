@@ -1,8 +1,16 @@
-body {
-  margin: 0;
+html, body, #root, #app {
+  height: 100%;
 }
 
 #app {
   display: flex;
-  height: 100vh;
+  flex-direction: column;
+
+  .navbar {
+    flex: none;
+  }
+
+  .page {
+    flex: 1;
+  }
 }

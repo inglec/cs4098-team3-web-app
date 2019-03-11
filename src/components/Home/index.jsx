@@ -12,9 +12,8 @@ const renderLinks = () => (
 );
 
 const Home = ({ isAuthenticated }) => (
-  <div>
-    <h1>HOME</h1>
-    { isAuthenticated ? renderLinks() : <Link to="/login">Log in</Link> }
+  <div className="page home">
+    {isAuthenticated ? renderLinks() : <Link to="/login">Log in</Link>}
   </div>
 );
 

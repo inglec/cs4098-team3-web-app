@@ -1,13 +1,19 @@
-.login {
-  align-items: center;
+.login-container {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
 
   .loginbox {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
   }
 
-  .login-error {
-    color: red;
+  .login-status {
+    display: flex;
+    justify-content: center;
+
+    .login-error {
+      flex: 1;
+    }
   }
 }
