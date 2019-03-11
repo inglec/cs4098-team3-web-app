@@ -18,7 +18,7 @@ const Chat = ({ messages, sendMessage }) => (
         ))
       }
     </div>
-    <TextBox buttonLabel="Send" onSubmit={sendMessage} />
+    <TextBox buttonLabel="Send" placeholder="Send a message" onSubmit={sendMessage} />
   </div>
 );
 

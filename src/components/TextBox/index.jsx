@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-
-import './styles';
+import Button from 'react-bootstrap/Button';
+import FormControl from 'react-bootstrap/FormControl';
+import InputGroup from 'react-bootstrap/InputGroup';
 
 class TextBox extends Component {
   constructor(props) {
@@ -14,15 +15,36 @@ class TextBox extends Component {
     this.setState({ text: event.target.value });
   }
 
+  onClickSubmit() {
+    const { text } = this.state;
+    const { onSubmit } = this.props;
+
+    onSubmit(text);
+    this.setState({ text: '' });
+  }
+
   render() {
     const { text } = this.state;
-    const { buttonLabel, onSubmit } = this.props;
+    const { buttonLabel, placeholder } = this.props;
 
     return (
-      <div className="textbox">
-        <input type="text" onChange={event => this.onTextChange(event)} />
-        <button type="button" onClick={() => onSubmit(text)}>{buttonLabel}</button>
-      </div>
+      <InputGroup className="textbox">
+        <FormControl
+          as="input"
+          placeholder={placeholder}
+          onChange={event => this.onTextChange(event)}
+          value={text}
+        />
+        <InputGroup.Append>
+          <Button
+            variant="outline-primary"
+            disabled={!text}
+            onClick={() => this.onClickSubmit()}
+          >
+            {buttonLabel}
+          </Button>
+        </InputGroup.Append>
+      </InputGroup>
     );
   }
 }
@@ -31,10 +53,12 @@ TextBox.propTypes = {
   onSubmit: PropTypes.func.isRequired,
 
   buttonLabel: PropTypes.string,
+  placeholder: PropTypes.string,
 };
 
 TextBox.defaultProps = {
   buttonLabel: 'Submit',
+  placeholder: 'Enter text',
 };
 
 export default TextBox;
