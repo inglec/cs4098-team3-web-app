@@ -10,6 +10,7 @@ import Home from 'app-containers/Home';
 import Login from 'app-containers/Login';
 import Navbar from 'app-containers/Navbar';
 import Session from 'app-containers/Session';
+import VideoReview from 'app-components/VideoReview'
 
 import { urls } from 'app-root/src/config';
 
@@ -33,7 +34,7 @@ const App = ({ isAuthenticated }) => (
           url={urls.remote} // TODO: Change
         />
         <PrivateRoute path="/profile" isAuthenticated={isAuthenticated} component={Profile} />
-
+        <PrivateRoute path="/review" isAuthenticated={isAuthenticated} component={VideoReview} />
         { /* Catch unmatched paths and serve 404 component. */ }
         <Route component={NotFound} />
       </Switch>
