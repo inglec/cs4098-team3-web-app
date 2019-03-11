@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import Alert from 'react-bootstrap/Alert';
 import { Redirect } from 'react-router-dom';
 
 import LoginBox from 'app-components/LoginBox';
@@ -8,19 +9,23 @@ import Spinner from 'app-components/Spinner';
 import './styles';
 
 const renderError = error => (
-  <span className="login-error">
+  <Alert variant="danger" className="login-error">
     { 'Error: ' }
     { error }
-  </span>
+  </Alert>
 );
 
 const renderLoginPage = (error, loading, onSubmitCredentials) => (
   <div>
     <h1>Log In</h1>
-    <div className="login">
-      <LoginBox onSubmit={onSubmitCredentials} />
-      { error ? renderError(error) : null }
-      { loading ? <Spinner /> : null }
+    <div className="login-container">
+      <div className="login">
+        <LoginBox onSubmit={onSubmitCredentials} />
+        <div className="login-status">
+          { error ? renderError(error) : null }
+          { loading ? <Spinner /> : null }
+        </div>
+      </div>
     </div>
   </div>
 );
