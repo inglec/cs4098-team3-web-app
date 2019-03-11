@@ -8,6 +8,7 @@ import NotFound from 'app-components/NotFound';
 import Profile from 'app-components/Profile';
 import Home from 'app-containers/Home';
 import Login from 'app-containers/Login';
+import Navbar from 'app-containers/Navbar';
 import Session from 'app-containers/Session';
 
 import { urls } from 'app-root/src/config';
@@ -15,8 +16,9 @@ import { urls } from 'app-root/src/config';
 import './styles';
 
 const App = ({ isAuthenticated }) => (
-  <div id="app">
-    <BrowserRouter>
+  <BrowserRouter>
+    <div id="app">
+      <Navbar />
       <Switch>
         { /* Public routes which don't require authentication. */ }
         <Route exact path="/" component={Home} />
@@ -35,8 +37,8 @@ const App = ({ isAuthenticated }) => (
         { /* Catch unmatched paths and serve 404 component. */ }
         <Route component={NotFound} />
       </Switch>
-    </BrowserRouter>
-  </div>
+    </div>
+  </BrowserRouter>
 );
 
 App.propTypes = {
