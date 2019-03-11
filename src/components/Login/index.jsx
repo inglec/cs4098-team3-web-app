@@ -10,8 +10,8 @@ import './styles';
 
 const renderError = error => (
   <Alert variant="danger" className="login-error">
-    { 'Error: ' }
-    { error }
+    {'Error: '}
+    {error}
   </Alert>
 );
 
@@ -22,8 +22,8 @@ const renderLoginPage = (error, loading, onSubmitCredentials) => (
       <div>
         <LoginBox onSubmit={onSubmitCredentials} />
         <div className="login-status">
-          { error ? renderError(error) : null }
-          { loading ? <Spinner /> : null }
+          {error ? renderError(error) : null}
+          {loading ? <Spinner /> : null}
         </div>
       </div>
     </div>

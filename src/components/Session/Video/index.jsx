@@ -67,4 +67,8 @@ Video.propTypes = {
   displayName: PropTypes.string,
 };
 
+Video.defaultProps = {
+  displayName: '',
+};
+
 export default Video;

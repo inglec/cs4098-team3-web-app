@@ -39,7 +39,7 @@ const AppNavbar = (props) => {
       <Navbar.Brand href="#" onClick={() => push('/')}>Treatment Together</Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
-        { /* Left-aligned section */ }
+        {/* Left-aligned section */}
         <Nav className="mr-auto">
           {renderNavLink('/', 'Home', push, pathname)}
           {renderNavLink('/profile', 'My Profile', push, pathname)}
