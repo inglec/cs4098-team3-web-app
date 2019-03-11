@@ -13,8 +13,20 @@
   }
 }
 
+@keyframes grow {
+  0% {
+    height: 0;
+    width: 0;
+  }
+
+  100% {
+    height: @spinner-diameter;
+    width: @spinner-diameter;
+  }
+}
+
 .spinner {
-  animation: spin 1.5s ease-out infinite;
+  animation: spin 1.5s ease-out infinite, grow 0.1s;
   border: @spinner-thickness solid @spinner-secondary;
   border-bottom: @spinner-thickness solid @spinner-primary;
   border-radius: 50%;
