@@ -16,10 +16,10 @@ const renderError = error => (
 );
 
 const renderLoginPage = (error, loading, onSubmitCredentials) => (
-  <div className="page">
+  <div className="page login">
     <div className="login-container">
       <h3>Log In to Treatment Together</h3>
-      <div className="login">
+      <div>
         <LoginBox onSubmit={onSubmitCredentials} />
         <div className="login-status">
           { error ? renderError(error) : null }

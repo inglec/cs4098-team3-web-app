@@ -92,7 +92,7 @@ class Session extends Component {
     const { messages, users } = this.state;
 
     return (
-      <div className="session">
+      <div className="page session">
         <div className="session-main">
           <div className="videos-container">
             <div className="videos">
