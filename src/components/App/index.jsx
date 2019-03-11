@@ -10,7 +10,7 @@ import Home from 'app-containers/Home';
 import Login from 'app-containers/Login';
 import Navbar from 'app-containers/Navbar';
 import Session from 'app-containers/Session';
-import VideoReview from 'app-components/VideoReview'
+import VideoReview from 'app-components/Review'
 
 import { urls } from 'app-root/src/config';
 
