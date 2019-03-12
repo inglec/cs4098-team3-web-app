@@ -1,0 +1,45 @@
+{
+  "patients": [
+    {
+      "uid": "0917-7324",
+      "displayName" : "Conor",
+      "image": "dummy",
+      "medicalInfo": [ "Takes the red pill", "XTB" ]
+    },
+
+    {
+      "uid": "0917-7325",
+      "displayName" : "Ciaran",
+      "image": "dummy",
+      "medicalInfo": ["Takes the blue pill", "XTB"]
+    },
+
+    {
+      "uid": "0917-7326",
+      "displayName" : "Eddie",
+      "image": "dummy",
+      "medicalInfo": ["Takes the green pill", "XTB"]
+    },
+
+    {
+      "uid": "0917-7327",
+      "displayName" : "Alex",
+      "image": "dummy",
+      "medicalInfo": ["Takes the yellow pill", "XTB"]
+    },
+
+    {
+      "uid": "0917-7328",
+      "displayName" : "Conal",
+      "image": "dummy",
+      "medicalInfo": ["Takes the purple pill", "XTB"]
+    },
+
+    {
+      "uid": "0917-7329",
+      "displayName" : "Chris",
+      "image": "dummy",
+      "medicalInfo": ["Takes the orange pill", "XTB"]
+    }
+  ]
+}

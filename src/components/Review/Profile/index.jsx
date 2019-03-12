@@ -1,8 +1,8 @@
 import React from 'react';
 
-const Profile = () => (
+const Profile = ({ profile }) => (
   <div className="profile">
-    <h1>I am groot</h1>
+    <p>I am {profile.displayName}</p>
   </div>
 );
 
