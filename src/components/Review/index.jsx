@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { patients } from 'app-root/data/test/patients';
+import { patientsByGroup, getVideoSrcById } from 'app-utils/requests';
 
 import Video from './Video';
 import Note from './Note';
@@ -10,30 +10,43 @@ import Profile from './Profile';
 
 import './styles';
 
-
-/* Demo Variables */
-
-const dummyPic = 'app-root/data/test/nopic.png'
-
-
 class Review extends React.Component {
   constructor(props) {
     super(props);
 
-    // this.patients = props.patients
-    // this.videoSrc = props.videoSrc
+    this.state = {
+      patients: [],
+      videoSrc: null,
+    };
 
-    // For demo
+    // Promise: Get video src for the review
+    getVideoSrcById(props.videoId)
+      .then((videoSrc) => {
+        this.setState({ videoSrc });
+      })
+      .catch((error) => {
+        // Display some error, video not found
+        console.error(error);
+      });
 
+    patientsByGroup(props.groupId)
+      .then((patients) => {
+        this.setState({ patients });
+      })
+      .catch((error) => {
+        // Display some error, patients not found
+        console.error(error);
+      });
   }
 
   render() {
+    const { videoSrc, patients } = this.state;
     return (
       <div className="review">
 
         <div className="review-video">
           <Video
-            src={this.videoSrc}
+            videoSrc={videoSrc}
           />
         </div>
 
@@ -43,10 +56,10 @@ class Review extends React.Component {
 
         <div className="review-profiles">
           {
-            _.map(this.patients, profile => (
+            _.map(patients, patientProfile => (
               <Profile
-                key={profile.uid}
-                profile={profile}
+                key={patientProfile.uid}
+                profile={patientProfile}
               />
             ))
           }
@@ -56,5 +69,10 @@ class Review extends React.Component {
     );
   }
 }
+
+Review.propTypes = {
+  videoId: PropTypes.string.isRequired,
+  groupId: PropTypes.string.isRequired,
+};
 
 export default Review;

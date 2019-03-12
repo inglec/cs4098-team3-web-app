@@ -5,12 +5,12 @@ import React from 'react';
 */
 const Video = ({ videoSrc }) => (
   <div className="review-video">
-    <video className="video" width="640" height="480" loop autoPlay controls>
+    <video key={videoSrc} className="video" controls>
       <source src={videoSrc} type="video/mp4" />
-      <source src={videoSrc} type="video/ogg" />
     </video>
 
   </div>
 );
+
 
 export default Video;
