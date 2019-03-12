@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 /*
   Might need to be a class for functionality purposes
@@ -12,5 +13,8 @@ const Video = ({ videoSrc }) => (
   </div>
 );
 
+Video.propTypes = {
+  videoSrc: PropTypes.string.isRequired,
+};
 
 export default Video;
