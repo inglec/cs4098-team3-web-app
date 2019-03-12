@@ -25,6 +25,9 @@ const App = ({ isAuthenticated }) => (
         <Route exact path="/" component={Home} />
         <Route path="/login" component={Login} />
 
+        { /* Temporary route for testing purposes, need to decide how to get to here */}
+        <Route path="/review" component={VideoReview} />
+
         { /* Private routes which require authentication. */ }
         <PrivateRoute
           path="/session"
@@ -34,7 +37,7 @@ const App = ({ isAuthenticated }) => (
           url={urls.remote} // TODO: Change
         />
         <PrivateRoute path="/profile" isAuthenticated={isAuthenticated} component={Profile} />
-        <PrivateRoute path="/review" isAuthenticated={isAuthenticated} component={VideoReview} />
+
         { /* Catch unmatched paths and serve 404 component. */ }
         <Route component={NotFound} />
       </Switch>
