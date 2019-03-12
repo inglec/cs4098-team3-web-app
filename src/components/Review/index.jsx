@@ -12,7 +12,6 @@ import './styles';
 
 
 /* Demo Variables */
-const videoSrc = 'https://www.sample-videos.com/video123/mp4/480/big_buck_bunny_480p_1mb.mp4';
 
 const dummyPic = 'app-root/data/test/nopic.png'
 
@@ -25,11 +24,6 @@ class Review extends React.Component {
     // this.videoSrc = props.videoSrc
 
     // For demo
-    this.patients = patients;
-    this.videoSrc = videoSrc;
-    this.patients.forEach(p => {
-      p.image = dummyPic
-    });
 
   }
 
