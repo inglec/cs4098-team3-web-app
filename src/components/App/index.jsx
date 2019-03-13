@@ -4,6 +4,7 @@ import PrivateRoute from 'react-private-route';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import uuidv4 from 'uuid/v4';
 
+import Archives from 'app-components/Archives';
 import NotFound from 'app-components/NotFound';
 import Profile from 'app-components/Profile';
 import Home from 'app-containers/Home';
@@ -29,6 +30,8 @@ const App = ({ isAuthenticated }) => (
         <Route path="/review" component={VideoReview} />
 
         { /* Private routes which require authentication. */ }
+        <PrivateRoute path="/archives" isAuthenticated={isAuthenticated} component={Archives} />
+        <PrivateRoute path="/profile" isAuthenticated={isAuthenticated} component={Profile} />
         <PrivateRoute
           path="/session"
           isAuthenticated={isAuthenticated}
@@ -36,7 +39,6 @@ const App = ({ isAuthenticated }) => (
           uid={uuidv4()} // TODO: Not working, redux mapStateto props is overiding this anyway
           url={urls.remote} // TODO: Change
         />
-        <PrivateRoute path="/profile" isAuthenticated={isAuthenticated} component={Profile} />
 
         { /* Catch unmatched paths and serve 404 component. */ }
         <Route component={NotFound} />
