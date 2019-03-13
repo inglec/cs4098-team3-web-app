@@ -11,6 +11,7 @@ import Home from 'app-containers/Home';
 import Login from 'app-containers/Login';
 import Navbar from 'app-containers/Navbar';
 import Session from 'app-containers/Session';
+import VideoReview from 'app-components/Review'
 
 import { urls } from 'app-root/src/config';
 
@@ -24,6 +25,9 @@ const App = ({ isAuthenticated }) => (
         { /* Public routes which don't require authentication. */ }
         <Route exact path="/" component={Home} />
         <Route path="/login" component={Login} />
+
+        { /* Temporary route for testing purposes, need to decide how to get to here */}
+        <Route path="/review" component={VideoReview} />
 
         { /* Private routes which require authentication. */ }
         <PrivateRoute path="/archives" isAuthenticated={isAuthenticated} component={Archives} />

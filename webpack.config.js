@@ -32,6 +32,7 @@ module.exports = {
       'app-containers': path.resolve(__dirname, 'src/containers'),
       'app-redux': path.resolve(__dirname, 'src/redux'),
       'app-utils': path.resolve(__dirname, 'src/utils'),
+      'test-data': path.resolve(__dirname, 'data/test'),
     },
   },
   devServer: { historyApiFallback: true },
