@@ -2,44 +2,56 @@
   "patients": [
     {
       "uid": "0917-7324",
-      "displayName" : "Conor",
+      "displayName" : "Conor Nevin",
       "imageSrc": null,
-      "medicalInfo": [ "Takes the red pill", "XTB" ]
+      "medicalInfo": [ "Red pill", "XTB" ],
+      "present": true,
+      "ticks": 5
     },
 
     {
       "uid": "0917-7325",
-      "displayName" : "Ciaran",
+      "displayName" : "Ciaran Ingle",
       "imageSrc": null,
-      "medicalInfo": ["Takes the blue pill", "XTB"]
+      "medicalInfo": ["Blue pill", "XTB"],
+      "present": true,
+      "ticks" : 5
     },
 
     {
       "uid": "0917-7326",
-      "displayName" : "Eddie",
+      "displayName" : "Eddie Bergman",
       "imageSrc": null,
-      "medicalInfo": ["Takes the green pill", "XTB"]
+      "medicalInfo": ["Green pill", "XTB"],
+      "present": true,
+      "ticks" : 4
     },
 
     {
       "uid": "0917-7327",
-      "displayName" : "Alex",
+      "displayName" : "Alex Smirnov",
       "imageSrc": null,
-      "medicalInfo": ["Takes the yellow pill", "XTB"]
+      "medicalInfo": ["Yellow pill", "legend"],
+      "present": false,
+      "ticks" : 0
     },
 
     {
       "uid": "0917-7328",
-      "displayName" : "Conal",
+      "displayName" : "Conal Cosgrave",
       "imageSrc": null,
-      "medicalInfo": ["Takes the purple pill", "XTB"]
+      "medicalInfo": ["Purple pill", "XTB"],
+      "present": true,
+      "ticks" : 0
     },
 
     {
       "uid": "0917-7329",
-      "displayName" : "Chris",
+      "displayName" : "Chris Meaney",
       "imageSrc": null,
-      "medicalInfo": ["Takes the orange pill", "XTB"]
+      "medicalInfo": ["Orange pill", "XTB"],
+      "present": true,
+      "ticks" : 5
     }
   ]
 }
