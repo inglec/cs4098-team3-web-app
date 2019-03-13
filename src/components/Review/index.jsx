@@ -6,10 +6,10 @@ import Jumbotron from 'react-bootstrap/Jumbotron';
 import Collapse from 'react-bootstrap/Collapse';
 import Button from 'react-bootstrap/Button';
 
-import { patientsByGroup, getVideoSrcById } from 'app-utils/requests';
+import { patientsByGroup, getVideoById } from 'app-utils/requests';
 
 import Video from './Video';
-import Note from './Note';
+import LogMessage from './LogMessage';
 import Profile from './Profile';
 
 import './styles';
@@ -20,15 +20,16 @@ class Review extends React.Component {
 
     this.state = {
       patients: [],
+      peoplePresent: 0,
       videoSrc: null,
+      videoLog: [],
       notesOpen: false,
-      patientsPresent: 0,
     };
 
     // Promise: Get video src for the review
-    getVideoSrcById(props.videoId)
-      .then((videoSrc) => {
-        this.setState({ videoSrc });
+    getVideoById(props.videoId)
+      .then(({ videoSrc, videoLog }) => {
+        this.setState({ videoSrc, videoLog });
       })
       .catch((error) => {
         // Display some error, video not found
@@ -38,13 +39,13 @@ class Review extends React.Component {
     patientsByGroup(props.groupId)
       .then((patients) => {
         // Definitely a better way to do this (reduce)
-        let patientsPresent = 0;
+        let peoplePresent = 0;
         patients.forEach((patient) => {
           if (patient.present) {
-            patientsPresent += 1;
+            peoplePresent += 1;
           }
         });
-        this.setState({ patients, patientsPresent });
+        this.setState({ patients, peoplePresent });
       })
       .catch((error) => {
         // Display some error, patients not found
@@ -54,7 +55,7 @@ class Review extends React.Component {
 
   render() {
     const {
-      videoSrc, patients, notesOpen, patientsPresent,
+      videoSrc, videoLog, patients, notesOpen, peoplePresent,
     } = this.state;
 
     return (
@@ -75,19 +76,19 @@ class Review extends React.Component {
                   <Profile
                     key={patientProfile.uid}
                     profile={patientProfile}
-                    patientsPresent={patientsPresent}
+                    peoplePresent={peoplePresent}
                   />
                 ))
               }
             </div>
 
-            <div className="notes-button-container">
+            <div className="log-button-container">
               <Button
                 onClick={() => this.setState({ notesOpen: !notesOpen })}
-                className="notes-button"
+                className="log-button"
                 variant="outline-secondary"
               >
-                Notes
+                Session Log
               </Button>
             </div>
 
@@ -96,8 +97,22 @@ class Review extends React.Component {
         </div>
 
         <Collapse timeout={300} in={notesOpen}>
-          <div className="notes">
-            <Note />
+          <div className="log">
+            <div className="log-messages">
+              {
+                _.map(videoLog, ({
+                  type, sender, timestamp, message,
+                }) => (
+                  <LogMessage
+                    key={timestamp}
+                    type={type}
+                    sender={sender}
+                    timestamp={timestamp}
+                    message={message}
+                  />
+                ))
+              }
+            </div>
           </div>
         </Collapse>
 

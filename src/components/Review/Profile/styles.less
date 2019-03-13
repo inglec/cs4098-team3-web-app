@@ -6,15 +6,15 @@
   margin: 5px;
 
   .profile-top {
-    flex: 1;
+    flex: 3;
     flex-basis: 1;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
 
     .profile-image {
-      height: 70px;
-      width: 70px;
+      height: 120px;
+      width: 120px;
       margin: 5px;
       margin-right: 10px;
       margin-bottom: 10px;
@@ -30,18 +30,19 @@
   }
 
   .profile-bottom {
-    flex: 1 75%;
+    flex: 1;
 
-  
+
     .profile-card {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
       height: 100%;
 
-      .badge {
-        margin-left: 5px;
+      .profile-card-body {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: flex-end;
       }
+
 
     }
 

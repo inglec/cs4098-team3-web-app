@@ -4,7 +4,7 @@
       "uid": "0917-7324",
       "displayName" : "Conor Nevin",
       "imageSrc": null,
-      "medicalInfo": [ "Red pill", "XTB" ],
+      "medicalInfo": [ "Red pill"],
       "present": true,
       "ticks": 5
     },
@@ -13,7 +13,7 @@
       "uid": "0917-7325",
       "displayName" : "Ciaran Ingle",
       "imageSrc": null,
-      "medicalInfo": ["Blue pill", "XTB"],
+      "medicalInfo": ["Blue pill"],
       "present": true,
       "ticks" : 5
     },
@@ -22,7 +22,7 @@
       "uid": "0917-7326",
       "displayName" : "Eddie Bergman",
       "imageSrc": null,
-      "medicalInfo": ["Green pill", "XTB"],
+      "medicalInfo": ["Green pill"],
       "present": true,
       "ticks" : 4
     },
@@ -31,7 +31,7 @@
       "uid": "0917-7327",
       "displayName" : "Alex Smirnov",
       "imageSrc": null,
-      "medicalInfo": ["Yellow pill", "legend"],
+      "medicalInfo": ["Yellow pill"],
       "present": false,
       "ticks" : 0
     },
@@ -40,7 +40,7 @@
       "uid": "0917-7328",
       "displayName" : "Conal Cosgrave",
       "imageSrc": null,
-      "medicalInfo": ["Purple pill", "XTB"],
+      "medicalInfo": ["Purple pill"],
       "present": true,
       "ticks" : 0
     },
@@ -49,7 +49,7 @@
       "uid": "0917-7329",
       "displayName" : "Chris Meaney",
       "imageSrc": null,
-      "medicalInfo": ["Orange pill", "XTB"],
+      "medicalInfo": ["Orange pill"],
       "present": true,
       "ticks" : 5
     }
