@@ -1,10 +1,8 @@
-import _ from 'lodash';
 import React from 'react';
 import PropTypes from 'prop-types';
 
 import Image from 'react-bootstrap/Image';
 import Card from 'react-bootstrap/Card';
-import Badge from 'react-bootstrap/Badge';
 
 import './styles';
 
@@ -49,12 +47,11 @@ const Profile = ({ profile, peoplePresent }) => (
 
 
 const SubtitleText = ({ profile, peoplePresent }) => {
-  console.log(peoplePresent)
   if (!profile.present) {
-    return (<p>absent</p>);
+    return (<p>Note: absent</p>);
   }
   if (profile.ticks !== peoplePresent) {
-    return (<p>ticks: <i>{profile.ticks}</i></p>);
+    return (<p>Note: ticks <b>{profile.ticks}</b></p>);
   }
   return (null);
 };
