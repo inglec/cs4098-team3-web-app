@@ -3,9 +3,9 @@ import { connect } from 'react-redux';
 import Navbar from 'app-components/Navbar';
 
 import { logOut } from 'app-redux/actions';
-import { authSelector } from 'app-redux/selectors';
+import { getAuth } from 'app-redux/selectors';
 
-const mapStateToProps = state => ({ uid: authSelector(state).uid });
+const mapStateToProps = state => ({ uid: getAuth(state).uid });
 
 const mapDispatchToProps = dispatch => ({ onClickLogout: () => dispatch(logOut()) });
 
