@@ -40,10 +40,10 @@ class Chat extends Component {
     } = this.props;
 
     // Generate unique colour for each user
-    this.colourMap = users.reduce((colourMap, user) => {
-      if (!(user in colourMap)) {
+    this.colourMap = users.reduce((colourMap, uid) => {
+      if (!(uid in colourMap)) {
         // eslint-disable-next-line no-param-reassign
-        colourMap[user] = randomColor();
+        colourMap[uid] = randomColor();
       }
       return colourMap;
     }, this.colourMap);
@@ -55,22 +55,22 @@ class Chat extends Component {
           <Scrollbar ref={ref => this.constructor.scrollToBottom(ref)}>
             <div>
               {
-                messages.map(({ message, timestamp, uid }) => {
+                messages.map(({ sender, text, timestamp }) => {
                   const time = moment(timestamp).format('HH:mm:ss');
 
-                  const style = { color: this.colourMap[uid] };
-                  if (uid === selfUid) {
+                  const style = { color: this.colourMap[sender] };
+                  if (sender === selfUid) {
                     style.textDecoration = 'underline';
                   }
 
                   return (
-                    <Card className="message" key={`${uid}:${timestamp}`}>
+                    <Card className="message" key={`${sender}:${timestamp}`}>
                       <div>
                         <span className="user">
-                          <span style={style}>{uid}</span>
+                          <span style={style}>{sender}</span>
                           {': '}
                         </span>
-                        {message}
+                        {text}
                       </div>
                       <div className="time-container">
                         <Badge pill variant="light" className="time">{time}</Badge>
@@ -94,9 +94,9 @@ Chat.propTypes = {
 
   messages: PropTypes.arrayOf(
     PropTypes.exact({
-      message: PropTypes.string.isRequired,
+      text: PropTypes.string.isRequired,
       timestamp: PropTypes.number.isRequired,
-      uid: PropTypes.string.isRequired,
+      sender: PropTypes.string.isRequired,
     }),
   ),
   users: PropTypes.arrayOf(PropTypes.string),

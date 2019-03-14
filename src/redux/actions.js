@@ -13,11 +13,11 @@ export const createAction = (type, fields = {}) => ({
 });
 
 // Actions.
-export const addChatMessage = (sessionId, uid, message, timestamp) => (
+export const addChatMessage = (sessionId, sender, text, timestamp) => (
   createAction(ADD_CHAT_MESSAGE, ({
-    message,
-    uid,
+    sender,
     sessionId,
+    text,
     timestamp,
   }))
 );

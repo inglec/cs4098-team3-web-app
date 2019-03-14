@@ -17,8 +17,8 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = dispatch => ({
-  onReceiveMessage: (sessionId, { message, uid, timestamp }) => (
-    dispatch(addChatMessage(sessionId, uid, message, timestamp))
+  onReceiveMessage: (sessionId, { sender, text, timestamp }) => (
+    dispatch(addChatMessage(sessionId, sender, text, timestamp))
   ),
 });
 
