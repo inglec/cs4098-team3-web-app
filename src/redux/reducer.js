@@ -1,7 +1,9 @@
-import _ from 'lodash';
 import { combineReducers } from 'redux';
 
+import uuidv4 from 'uuid/v4';
+
 import {
+  ADD_CHAT_MESSAGE,
   LOG_IN_FAILURE,
   LOG_IN_STARTED,
   LOG_IN_SUCCESS,
@@ -17,15 +19,21 @@ const createDataState = (status, data) => ({
   ...data,
 });
 
-// TODO: re-adjust uid to be null until logged in
 const auth = (state = {}, action) => {
-  switch (action.type) {
+  const {
+    error,
+    token,
+    type,
+    uid,
+  } = action;
+
+  switch (type) {
     case LOG_IN_STARTED:
       return createDataState(LOADING);
     case LOG_IN_SUCCESS:
-      return createDataState(LOADED, _.pick(action, ['token', 'uid']));
+      return createDataState(LOADED, { token, uid });
     case LOG_IN_FAILURE:
-      return createDataState(LOADED, { error: action.error.message });
+      return createDataState(LOADED, { error: error.message });
     case LOG_OUT:
       return createDataState(LOADED);
     default:
@@ -33,4 +41,34 @@ const auth = (state = {}, action) => {
   }
 };
 
-export default combineReducers({ auth });
+const chat = (state = {}, action) => {
+  const {
+    message,
+    uid,
+    sessionId,
+    timestamp,
+    type,
+  } = action;
+
+  switch (type) {
+    case ADD_CHAT_MESSAGE: {
+      const previousMessages = state[sessionId] || [];
+      const newMessage = { message, timestamp, uid };
+
+      return {
+        ...state,
+        [sessionId]: [
+          ...previousMessages,
+          newMessage,
+        ],
+      };
+    }
+    default:
+      return state;
+  }
+};
+
+export default combineReducers({
+  auth,
+  chat,
+});
