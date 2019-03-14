@@ -4,10 +4,10 @@ import Login from 'app-components/Login';
 
 import { logIn } from 'app-redux/actions';
 import { LOADING } from 'app-redux/reducer';
-import { authSelector } from 'app-redux/selectors';
+import { getAuth } from 'app-redux/selectors';
 
 const mapStateToProps = (state) => {
-  const { error, status, token } = authSelector(state);
+  const { error, status, token } = getAuth(state);
 
   return {
     error,

@@ -8,7 +8,35 @@
   .messages {
     background-color: #EEEEEE;
     border-radius: 5px;
+    display: flex;
     flex: auto;
     margin-bottom: 5px;
+    padding: 2px;
+
+    .scrollbar-container {
+      flex: auto;
+
+      .message {
+        padding: 0 5px;
+
+        .user {
+          color: grey;
+        }
+
+        .time-container {
+          display: flex;
+          justify-content: flex-end;
+        }
+      }
+
+      // Add vertical space between messages
+      .message + .message {
+        margin-top: 2px;
+      }
+    }
+  }
+
+  .textbox {
+    flex: none;
   }
 }

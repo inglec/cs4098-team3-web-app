@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import { map } from 'lodash/collection';
+import { pickBy } from 'lodash/object';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 
@@ -20,8 +21,10 @@ class Session extends Component {
   constructor(props) {
     super(props);
 
+    const { selfUid, token, url } = props;
+
     this.state = {
-      messages: [],
+      sessionId: 'testsession', // FIXME: generate
       users: {},
     };
 
@@ -36,13 +39,12 @@ class Session extends Component {
     this.room
       .on(ROOM_CLOSE, () => this.onRoomClose())
       .on(ROOM_USER_CONNECT, user => this.onUserConnect(user));
-
-    const { token, uid, url } = this.props;
-
-    this.room.join(url, uid, token)
+    this.room
+      .join(url, selfUid, token)
       .then(({ audioStream, videoStream }) => {
         this.ownAudioStream = audioStream;
         this.ownVideoStream = videoStream;
+
         // Refs may not have been set if not rendered yet
         this.tryMountOwnMedia();
       });
@@ -74,7 +76,7 @@ class Session extends Component {
   onUserDisconnect(uid) {
     // Remove user from state
     this.setState(state => ({
-      users: _.pickBy(state.users, (user, key) => key !== uid),
+      users: pickBy(state.users, (user, key) => key !== uid),
     }));
   }
 
@@ -88,8 +90,26 @@ class Session extends Component {
     }
   }
 
+  sendMessage(text) {
+    const { onReceiveMessage, selfUid } = this.props;
+    const { sessionId } = this.state;
+
+    // Remove whitespace
+    const trimmed = text.trim();
+
+    if (trimmed) {
+      this.room.sendMessage(trimmed);
+      onReceiveMessage(sessionId, {
+        sender: selfUid,
+        text: trimmed,
+        timestamp: new Date().getTime(),
+      });
+    }
+  }
+
   render() {
-    const { messages, users } = this.state;
+    const { chat, chatUsers, selfUid } = this.props;
+    const { users, sessionId } = this.state;
 
     return (
       <div className="page session">
@@ -99,7 +119,7 @@ class Session extends Component {
 
               {
                 // TODO: Make event names constant in external file
-                _.map(users, (user, uid) => (
+                map(users, (user, uid) => (
                   <Video
                     key={uid}
                     uid={uid}
@@ -110,8 +130,8 @@ class Session extends Component {
               }
 
               <div className="own-media-container">
-                <audio className="audio" autoPlay ref={this.ownAudioRef} />
-                <video className="video" autoPlay ref={this.ownVideoRef} />
+                <audio autoPlay ref={this.ownAudioRef} />
+                <video autoPlay ref={this.ownVideoRef} />
               </div>
 
             </div>
@@ -122,8 +142,10 @@ class Session extends Component {
           />
         </div>
         <Chat
-          messages={messages}
-          sendMessage={message => this.room.sendMessage(message)}
+          messages={chat[sessionId]}
+          selfUid={selfUid}
+          sendMessage={text => this.sendMessage(text)}
+          users={chatUsers[sessionId]}
         />
       </div>
     );
@@ -131,8 +153,21 @@ class Session extends Component {
 }
 
 Session.propTypes = {
+  chat: PropTypes.objectOf(
+    PropTypes.arrayOf(
+      PropTypes.exact({
+        sender: PropTypes.string.isRequired,
+        text: PropTypes.string.isRequired,
+        timestamp: PropTypes.number.isRequired,
+      }),
+    ),
+  ).isRequired,
+  chatUsers: PropTypes.objectOf(
+    PropTypes.arrayOf(PropTypes.string),
+  ).isRequired,
+  onReceiveMessage: PropTypes.func.isRequired,
   token: PropTypes.string.isRequired,
-  uid: PropTypes.string.isRequired,
+  selfUid: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
 };
 

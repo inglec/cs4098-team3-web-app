@@ -7,8 +7,13 @@ import thunk from 'redux-thunk';
 
 import App from 'app-containers/App';
 import reducer from 'app-redux/reducer';
+import mockData from 'test-data/redux';
 
-const store = createStore(reducer, composeWithDevTools(applyMiddleware(thunk)));
+const store = createStore(
+  reducer,
+  mockData,
+  composeWithDevTools(applyMiddleware(thunk)),
+);
 
 const Component = (
   <Provider store={store}>
