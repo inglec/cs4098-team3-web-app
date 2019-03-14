@@ -1,24 +1,21 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router-dom';
-
+import SessionStatus from './SessionStatusBox';
+import MySession from './MySessions';
+import { sessions } from '../../../data/test/mockSessions';
 import './styles';
 
-const renderLinks = () => (
-  <div className="links">
-    <Link to="/session">Session</Link>
-    <Link to="/profile">My Profile</Link>
-  </div>
-);
 
-const Home = ({ isAuthenticated }) => (
+const Home = ({ selfUid, isAuthenticated }) => (
   <div className="page home">
-    {isAuthenticated ? renderLinks() : <Link to="/login">Log in</Link>}
+    {isAuthenticated ? <MySession uid={selfUid} sessions={sessions} /> : <Link to="/login">Log in</Link>}
   </div>
 );
 
 Home.propTypes = {
   isAuthenticated: PropTypes.bool.isRequired,
+  selfUid: PropTypes.string.isRequired,
 };
 
 export default Home;
