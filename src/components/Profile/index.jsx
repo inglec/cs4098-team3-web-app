@@ -16,7 +16,7 @@ const Profile = () => (
           <Container>
             <Row>
               <Col xs={12} sm={8}>
-                <h1> TP Hendersion</h1>
+                <h1> TP Henson</h1>
 
                 <p>
                   Taraji Penda Henson was born on September 11, 1970, in Washington, D.C.
