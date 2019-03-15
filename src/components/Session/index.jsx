@@ -1,4 +1,4 @@
-import { map, sortBy } from 'lodash/collection';
+import { map } from 'lodash/collection';
 import { pickBy } from 'lodash/object';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
@@ -90,18 +90,18 @@ class Session extends Component {
     }
   }
 
-  sendMessage(message) {
+  sendMessage(text) {
     const { onReceiveMessage, selfUid } = this.props;
     const { sessionId } = this.state;
 
     // Remove whitespace
-    const trimmed = message.trim();
+    const trimmed = text.trim();
 
     if (trimmed) {
       this.room.sendMessage(trimmed);
       onReceiveMessage(sessionId, {
-        uid: selfUid,
-        message: trimmed,
+        sender: selfUid,
+        text: trimmed,
         timestamp: new Date().getTime(),
       });
     }
@@ -110,9 +110,6 @@ class Session extends Component {
   render() {
     const { chat, chatUsers, selfUid } = this.props;
     const { users, sessionId } = this.state;
-
-    // Sort messages by timestamp
-    const messages = sortBy(chat[sessionId], message => message.timestamp);
 
     return (
       <div className="page session">
@@ -145,9 +142,9 @@ class Session extends Component {
           />
         </div>
         <Chat
-          messages={messages}
+          messages={chat[sessionId]}
           selfUid={selfUid}
-          sendMessage={message => this.sendMessage(message)}
+          sendMessage={text => this.sendMessage(text)}
           users={chatUsers[sessionId]}
         />
       </div>
@@ -159,9 +156,9 @@ Session.propTypes = {
   chat: PropTypes.objectOf(
     PropTypes.arrayOf(
       PropTypes.exact({
-        message: PropTypes.string.isRequired,
+        sender: PropTypes.string.isRequired,
+        text: PropTypes.string.isRequired,
         timestamp: PropTypes.number.isRequired,
-        uid: PropTypes.string.isRequired,
       }),
     ),
   ).isRequired,

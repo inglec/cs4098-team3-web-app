@@ -1,6 +1,5 @@
+import { sortBy } from 'lodash/collection';
 import { combineReducers } from 'redux';
-
-import uuidv4 from 'uuid/v4';
 
 import {
   ADD_CHAT_MESSAGE,
@@ -43,24 +42,25 @@ const auth = (state = {}, action) => {
 
 const chat = (state = {}, action) => {
   const {
-    message,
-    uid,
+    sender,
     sessionId,
+    text,
     timestamp,
     type,
   } = action;
 
   switch (type) {
     case ADD_CHAT_MESSAGE: {
-      const previousMessages = state[sessionId] || [];
-      const newMessage = { message, timestamp, uid };
+      const otherMessages = state[sessionId] || [];
+      const newMessage = { sender, text, timestamp };
+      const messages = [
+        ...otherMessages,
+        newMessage,
+      ];
 
       return {
         ...state,
-        [sessionId]: [
-          ...previousMessages,
-          newMessage,
-        ],
+        [sessionId]: sortBy(messages, message => message.timestamp),
       };
     }
     default:

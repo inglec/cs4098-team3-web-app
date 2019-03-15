@@ -7,13 +7,13 @@ export const getChat = state => state.chat;
 
 export const getSessions = state => state.sessions;
 
-// Array of unique UIDs in chat for each session
+// Array of unique users in chat for each session
 export const getChatUsers = createSelector(
   getChat,
   chat => (
     mapValues(chat, (session) => {
       const uids = new Set();
-      session.forEach(message => uids.add(message.uid));
+      session.forEach(message => uids.add(message.sender));
 
       return Array.from(uids);
     })
