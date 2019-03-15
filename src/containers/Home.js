@@ -2,8 +2,7 @@ import { connect } from 'react-redux';
 
 import Home from 'app-components/Home';
 
-import { getAuth } from 'app-redux/selectors';
-import { getSessions } from '../redux/selectors';
+import { getAuth, getSessions } from 'app-redux/selectors';
 
 const mapStateToProps = (state) => {
   const { uid, token } = getAuth(state);

@@ -13,28 +13,11 @@ const SessionBox = ({ session, push, path }) => {
   const getSessionCardText = () => {
     let text = '';
     if (complete) {
-      text = (
-        <p>
-          This session is over.
-          <br />
-          Click the button below to review.
-        </p>
-      );
+      text = 'This session is over. Click the button below to review.';
     } else if (active) {
-      text = (
-        <p>
-          Session is currently active.
-          <br />
-          Click the button below to join.
-        </p>
-      );
+      text = 'Session is currently active. Click the button below to join.';
     } else {
-      text = (
-        <p>
-          This session has not begun yet
-          <br />
-        </p>
-      );
+      text = 'This session has not begun yet';
     }
     return text;
   };
@@ -73,9 +56,13 @@ const SessionBox = ({ session, push, path }) => {
     <div>
       <Card className="cards">
         <Card.Img className="cardImage" variant="top" src={getSessionCardImage()} />
-        <Card.Text>
+        <Card.Title>
           <h2>{day}</h2>
+        </Card.Title>
+        <Card.Text>
           {getSessionCardText()}
+        </Card.Text>
+        <Card.Text>
           {getSessionButton()}
         </Card.Text>
       </Card>
@@ -85,7 +72,11 @@ const SessionBox = ({ session, push, path }) => {
 };
 
 SessionBox.propTypes = {
-  session: PropTypes.objectOf(PropTypes.oneOf([PropTypes.string, PropTypes.bool])).isRequired,
+  session: PropTypes.exact({
+    day: PropTypes.string.isRequired,
+    active: PropTypes.bool.isRequired,
+    complete: PropTypes.bool.isRequired,
+  }).isRequired,
   push: PropTypes.func.isRequired,
   path: PropTypes.string.isRequired,
 };

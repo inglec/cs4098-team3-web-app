@@ -7,7 +7,9 @@ const SessionList = ({
   sessions, title, push, path,
 }) => {
   const cards = sessions
-  && sessions.map(session => <SessionBox session={session} push={push} path={path} />);
+    ? sessions
+      .map(session => <SessionBox session={session} push={push} path={path} key={session.day} />)
+    : null;
   return (
     <div className="sessionList">
       <h2>{title}</h2>
