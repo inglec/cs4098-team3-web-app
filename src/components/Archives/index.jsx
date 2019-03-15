@@ -56,7 +56,7 @@ class Archives extends Component {
   }
 
   renderSelectedSession() {
-    const { group: { members }, sessions } = this.props;
+    const { group: { members }, history, sessions } = this.props;
     const { selectedSessionId } = this.state;
     const selectedSession = sessions[selectedSessionId];
 
@@ -103,7 +103,7 @@ class Archives extends Component {
             }
           </ListGroup>
         </Form.Group>
-        <Button>View Session Archive</Button>
+        <Button onClick={() => history.push('/review')}>View Session Archive</Button>
       </Form>
     );
   }
@@ -138,6 +138,10 @@ class Archives extends Component {
 
 // TODO: Make required
 Archives.propTypes = {
+  history: PropTypes.shape({
+    push: PropTypes.func.isRequired,
+  }).isRequired,
+
   group: PropTypes.exact({
     admin: PropTypes.string.isRequired,
     members: PropTypes.arrayOf(PropTypes.string).isRequired,
