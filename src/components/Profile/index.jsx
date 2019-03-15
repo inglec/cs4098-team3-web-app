@@ -19,7 +19,7 @@ const Profile = () => (
                 <h1> TP Hendersion</h1>
 
                 <p>
-									Taraji Penda Henson was born on September 11, 1970, in Washington, D.C.
+                  Taraji Penda Henson was born on September 11, 1970, in Washington, D.C.
                   She landed her first professional acting gig on Smart Guy. In
                   2001 she got her big break in the film Baby Boy. Her
                   performance led to the role of Shug in Hustle and Flow and in
