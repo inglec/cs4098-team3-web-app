@@ -44,7 +44,6 @@ const AppNavbar = (props) => {
           {renderNavLink('/', 'Home', push, pathname)}
           {renderNavLink('/profile', 'My Profile', push, pathname)}
           {renderNavLink('/archives', 'Archives', push, pathname)}
-          {renderNavLink('/review', 'Review', push, pathname)}
         </Nav>
 
         { /* Right-aligned section */ }
