@@ -1,12 +1,56 @@
 .archives {
   display: flex;
 
-  .archives-left {
-    flex: 1;
-    background-color: red;
+  .archives-container {
+    display: flex;
+    flex-direction: row;
+    flex: auto;
+    padding: 10px;
+
+    .archives-col {
+      display: flex;
+      flex: auto;
+      flex-direction: column;
+      padding: 20px;
+
+      h5 {
+        flex: none;
+      }
+
+      .card {
+        flex: auto;
+
+        .icon {
+          margin-right: 5px;
+
+          &.check {
+            color: green;
+          }
+
+          &.x {
+            color: red;
+          }
+        }
+
+        .status {
+          margin-left: 10px;
+        }
+
+        .unselected {
+          color: grey;
+          text-align: center;
+        }
+
+        .scrollbar-container {
+          .ps__rail-y {
+            z-index: 3;
+          }
+        }
+      }
+    }
   }
 
-  .archives-right {
-    flex: 1;
+  .archives-col + .archives-col {
+    border-left: 1px solid lightgrey;
   }
 }
