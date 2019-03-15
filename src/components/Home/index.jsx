@@ -2,10 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import SessionList from './SessionList';
-import { sessions } from '../../../data/test/mockSessions';
 import './styles';
 
-const createSessionLists = (push) => {
+const createSessionLists = (sessions, push) => {
   const activeSessions = sessions.filter(session => session.active);
   const reviewSessions = sessions.filter(session => !session.active && session.complete);
   const futureSessions = sessions.filter(session => !session.active && !session.complete);
@@ -18,12 +17,12 @@ const createSessionLists = (push) => {
     </div>
   );
 };
-const Home = ({ isAuthenticated, history }) => {
+const Home = ({ isAuthenticated, history, sessions }) => {
   const { push } = history;
 
   return (
     <div className="page home">
-      {isAuthenticated ? createSessionLists(push) : <Link to="/login">Log in</Link>}
+      {isAuthenticated ? createSessionLists(sessions, push) : <Link to="/login">Log in</Link>}
     </div>
   );
 };
@@ -31,6 +30,11 @@ const Home = ({ isAuthenticated, history }) => {
 Home.propTypes = {
   isAuthenticated: PropTypes.bool.isRequired,
   history: PropTypes.shape({ push: PropTypes.func.isRequired }).isRequired,
+  sessions: PropTypes.arrayOf(PropTypes.exact({
+    day: PropTypes.string.isRequired,
+    active: PropTypes.bool.isRequired,
+    complete: PropTypes.bool.isRequired,
+  })).isRequired,
 };
 
 export default Home;

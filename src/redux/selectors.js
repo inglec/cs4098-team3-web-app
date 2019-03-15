@@ -5,6 +5,8 @@ export const getAuth = state => state.auth;
 
 export const getChat = state => state.chat;
 
+export const getSessions = state => state.sessions;
+
 // Array of unique UIDs in chat for each session
 export const getChatUsers = createSelector(
   getChat,
