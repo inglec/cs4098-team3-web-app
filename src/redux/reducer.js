@@ -68,7 +68,10 @@ const chat = (state = {}, action) => {
   }
 };
 
+const sessions = (state = {}) => state;
+
 export default combineReducers({
   auth,
   chat,
+  sessions,
 });
