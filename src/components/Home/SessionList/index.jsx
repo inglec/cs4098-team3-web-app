@@ -14,7 +14,7 @@ const SessionList = ({
     <div className="sessionList">
       <h2>{title}</h2>
       <div className="cardHolders">
-        { cards }
+        {cards}
       </div>
     </div>
   );
