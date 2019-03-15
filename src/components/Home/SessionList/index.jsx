@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import SessionStatus from '../SessionStatusBox';
+import SessionBox from '../SessionBox';
 import './styles';
 
 const SessionList = ({
   sessions, title, push, path,
 }) => {
   const cards = sessions
-  && sessions.map(session => <SessionStatus session={session} push={push} path={path} />);
+  && sessions.map(session => <SessionBox session={session} push={push} path={path} />);
   return (
     <div className="sessionList">
       <h2>{title}</h2>
