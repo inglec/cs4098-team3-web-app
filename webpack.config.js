@@ -2,7 +2,7 @@ const HtmlWebPackPlugin = require('html-webpack-plugin');
 const path = require('path');
 
 module.exports = (env) => {
-  const configURI = (env.config === 'prod')
+  const configPath = (env.config === 'prod')
     ? 'src/config.prod.json'
     : 'src/config.dev.json';
   return {
@@ -39,7 +39,7 @@ module.exports = (env) => {
         'app-redux': path.resolve(__dirname, 'src/redux'),
         'app-utils': path.resolve(__dirname, 'src/utils'),
         'test-data': path.resolve(__dirname, 'data/test'),
-        'app-config': path.resolve(__dirname, configURI),
+        'app-config': path.resolve(__dirname, configPath),
       },
     },
 
