@@ -13,9 +13,9 @@ import Navbar from 'app-containers/Navbar';
 import Session from 'app-containers/Session';
 import VideoReview from 'app-components/Review';
 
-import { urls } from 'app-root/src/config';
-
 import './styles';
+
+import config from 'app-config';
 
 const App = ({ isAuthenticated }) => (
   <BrowserRouter>
@@ -39,7 +39,7 @@ const App = ({ isAuthenticated }) => (
           isAuthenticated={isAuthenticated}
           component={Session}
           uid={uuidv4()} // TODO: Not working, redux mapStateto props is overiding this anyway
-          url={urls.remote} // TODO: Change
+          url={config.videoServerUrl}
         />
 
         { /* Catch unmatched paths and serve 404 component. */ }
