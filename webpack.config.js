@@ -2,9 +2,7 @@ const HtmlWebPackPlugin = require('html-webpack-plugin');
 const path = require('path');
 
 module.exports = (env) => {
-  const configPath = (env.config === 'prod')
-    ? 'src/config.prod.json'
-    : 'src/config.dev.json';
+  const configPath = (env.location === 'remote') ? 'src/config.prod.json' : 'src/config.dev.json';
   return {
     output: {
       path: path.resolve(__dirname, 'dist'),

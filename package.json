@@ -2,10 +2,10 @@
   "name": "tb-or-not-tb-client",
   "author": "Ciarán Ingle, Eddie Bergman, Alex Smirnov, Conal Cosgrove, Conor Nevin, Christopher Meaney",
   "scripts": {
-    "build": "webpack --env.production=true --mode=production --config webpack.config.js",
+    "build": "webpack --env.location=remote --mode=production",
     "lint": "eslint src",
-    "start": "webpack-dev-server --env.production=false --mode=development --hot --config webpack.config.js",
-    "start-production": "webpack-dev-server --env.production=true --mode=production --hot --config webpack.config.js"
+    "start": "webpack-dev-server --env.location=local --mode=development --hot",
+    "start-production": "webpack-dev-server --env.location=remote --mode=production --hot"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
