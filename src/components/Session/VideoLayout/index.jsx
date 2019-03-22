@@ -94,11 +94,9 @@ class VideoLayout extends Component {
     const uids = Object.keys(users);
 
     // Calculate width:height ratio for each video
-    const aspectRatios = mapValues(this.mediaContainerRefs, (ref) => {
-      const { clientWidth, clientHeight } = ref;
-
-      return clientWidth / clientHeight;
-    });
+    const aspectRatios = mapValues(this.mediaContainerRefs, ({ clientHeight, clientWidth }) => (
+      clientWidth / clientHeight
+    ));
 
     // Calculate how many pixels a unit would equal in order to fit all videos in a row
     const calculatePixelsPerUnit = (rowUids, height) => {
