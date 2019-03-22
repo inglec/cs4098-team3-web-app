@@ -3,6 +3,8 @@ import React from 'react';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
+import SettingsIcon from 'react-feather/dist/icons/settings';
+import HomeIcon from 'react-feather/dist/icons/home';
 import { withRouter } from 'react-router-dom';
 
 const renderNavLink = (href, linkText, push, pathname) => (
@@ -18,7 +20,7 @@ const renderNavDropdown = (uid, push, onClickLogout) => (
   uid
     ? (
       <NavDropdown title={uid} alignRight>
-        <NavDropdown.Item onClick={() => push('settings')}>Settings</NavDropdown.Item>
+        <NavDropdown.Item onClick={() => push('settings')}><SettingsIcon />Settings</NavDropdown.Item>
         <NavDropdown.Divider />
         <NavDropdown.Item onClick={onClickLogout}>Log Out</NavDropdown.Item>
       </NavDropdown>
@@ -41,7 +43,7 @@ const AppNavbar = (props) => {
       <Navbar.Collapse id="basic-navbar-nav">
         {/* Left-aligned section */}
         <Nav className="mr-auto">
-          {renderNavLink('/', 'Home', push, pathname)}
+          {renderNavLink('/', <HomeIcon />, push, pathname)}
           {renderNavLink('/profile', 'My Profile', push, pathname)}
           {renderNavLink('/archives', 'Archives', push, pathname)}
         </Nav>
