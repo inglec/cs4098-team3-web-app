@@ -1,19 +1,13 @@
-import { map } from 'lodash/collection';
 import { pickBy } from 'lodash/object';
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React, { Component, createRef } from 'react';
 
 import Room from 'app-utils/video/Room';
-import {
-  ROOM_CLOSE,
-  ROOM_USER_CONNECT,
-  USER_ADD_MEDIA,
-  USER_REMOVE_MEDIA,
-} from 'app-utils/video/events';
+import { ROOM_CLOSE, ROOM_USER_CONNECT } from 'app-utils/video/events';
 
 import Chat from './Chat';
 import Options from './Options';
-import Video from './Video';
+import VideoLayout from './VideoLayout';
 
 import './styles';
 
@@ -30,8 +24,8 @@ class Session extends Component {
 
     // Didn't put into state as we might not want to rerender whole page if
     // media cuts out
-    this.ownAudioRef = React.createRef();
-    this.ownVideoRef = React.createRef();
+    this.ownAudioRef = createRef();
+    this.ownVideoRef = createRef();
     this.ownAudioStream = null;
     this.ownVideoStream = null;
 
@@ -114,27 +108,8 @@ class Session extends Component {
     return (
       <div className="page session">
         <div className="session-main">
-          <div className="videos-container">
-            <div className="videos">
-
-              {
-                // TODO: Make event names constant in external file
-                map(users, (user, uid) => (
-                  <Video
-                    key={uid}
-                    uid={uid}
-                    onUserAddMedia={callback => user.on(USER_ADD_MEDIA, callback)}
-                    onUserRemoveMedia={callback => user.on(USER_REMOVE_MEDIA, callback)}
-                  />
-                ))
-              }
-
-              <div className="own-media-container">
-                <audio autoPlay ref={this.ownAudioRef} />
-                <video autoPlay ref={this.ownVideoRef} />
-              </div>
-
-            </div>
+          <div className="videolayout-container">
+            <VideoLayout users={users} />
           </div>
           <Options
             isMuted={this.room.isMuted}
