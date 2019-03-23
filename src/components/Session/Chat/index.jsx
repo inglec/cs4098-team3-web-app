@@ -5,6 +5,7 @@ import React, { Component } from 'react';
 import Badge from 'react-bootstrap/Badge';
 import Card from 'react-bootstrap/Card';
 import Scrollbar from 'react-perfect-scrollbar';
+import SendIcon from 'react-feather/dist/icons/send';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 
 import TextBox from 'app-components/TextBox';
@@ -82,7 +83,7 @@ class Chat extends Component {
             </div>
           </Scrollbar>
         </div>
-        <TextBox buttonLabel="Send" placeholder="Send a message" onSubmit={sendMessage} />
+        <TextBox buttonLabel= <SendIcon /> placeholder="Send a message" onSubmit={sendMessage} />
       </div>
     );
   }

@@ -5,6 +5,9 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import SettingsIcon from 'react-feather/dist/icons/settings';
 import HomeIcon from 'react-feather/dist/icons/home';
+import UserIcon from 'react-feather/dist/icons/user';
+import ArchiveIcon from 'react-feather/dist/icons/archive';
+import LOIcon from 'react-feather/dist/icons/log-out';
 import { withRouter } from 'react-router-dom';
 
 const renderNavLink = (href, linkText, push, pathname) => (
@@ -20,9 +23,9 @@ const renderNavDropdown = (uid, push, onClickLogout) => (
   uid
     ? (
       <NavDropdown title={uid} alignRight>
-        <NavDropdown.Item onClick={() => push('settings')}><SettingsIcon />Settings</NavDropdown.Item>
+        <NavDropdown.Item onClick={() => push('settings')}>Settings <SettingsIcon /></NavDropdown.Item>
         <NavDropdown.Divider />
-        <NavDropdown.Item onClick={onClickLogout}>Log Out</NavDropdown.Item>
+        <NavDropdown.Item onClick={onClickLogout}>Log Out <LOIcon /></NavDropdown.Item>
       </NavDropdown>
     )
     : <Nav.Link onClick={() => push('/login')}>Log In</Nav.Link>
@@ -44,8 +47,8 @@ const AppNavbar = (props) => {
         {/* Left-aligned section */}
         <Nav className="mr-auto">
           {renderNavLink('/', <HomeIcon />, push, pathname)}
-          {renderNavLink('/profile', 'My Profile', push, pathname)}
-          {renderNavLink('/archives', 'Archives', push, pathname)}
+          {renderNavLink('/profile', <UserIcon />, push, pathname)}
+          {renderNavLink('/archives', <ArchiveIcon />, push, pathname)}
         </Nav>
 
         { /* Right-aligned section */ }
