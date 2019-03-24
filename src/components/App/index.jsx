@@ -38,7 +38,6 @@ const App = ({ isAuthenticated }) => (
           path="/session"
           isAuthenticated={isAuthenticated}
           component={Session}
-          uid={uuidv4()} // TODO: Not working, redux mapStateto props is overiding this anyway
           url={config.videoServerUrl}
         />
 
