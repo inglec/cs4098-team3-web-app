@@ -14,10 +14,14 @@ export const MEDIASOUP_REQUEST = 'mediasoup-request';
  *
  * - When a new user joins the room
  *   room-userconnect: { user }
+ *
+ * - When a new chat message is sent into the room
+ *   room-chat-message
  */
 
 export const ROOM_CLOSE = 'room-close';
 export const ROOM_USER_CONNECT = 'room-userconnect';
+export const ROOM_CHAT_MESSAGE = 'room-chat-message';
 
 /**
  * Events:

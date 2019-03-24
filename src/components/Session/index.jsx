@@ -2,10 +2,14 @@ import { pickBy } from 'lodash/object';
 import PropTypes from 'prop-types';
 import React, { Component, createRef } from 'react';
 
+import Chat from 'app-containers/Chat'
 import Room from 'app-utils/video/Room';
-import { ROOM_CLOSE, ROOM_USER_CONNECT } from 'app-utils/video/events';
+import {
+  ROOM_CLOSE,
+  ROOM_USER_CONNECT,
+  ROOM_CHAT_MESSAGE,
+ } from 'app-utils/video/events';
 
-import Chat from './Chat';
 import Options from './Options';
 import VideoLayout from './VideoLayout';
 
@@ -32,7 +36,9 @@ class Session extends Component {
     this.room = new Room();
     this.room
       .on(ROOM_CLOSE, () => this.onRoomClose())
-      .on(ROOM_USER_CONNECT, user => this.onUserConnect(user));
+      .on(ROOM_USER_CONNECT, user => this.onUserConnect(user))
+      .on(ROOM_CHAT_MESSAGE, message => this.onRoomChatMessage(message));
+
     this.room
       .join(url, selfUid, token)
       .then(({ audioStream, videoStream }) => {
@@ -64,6 +70,7 @@ class Session extends Component {
         ...state.users,
         [user.uid]: user,
       },
+      // TODO: Logic for chatUsers into store
     }));
   }
 
@@ -72,6 +79,14 @@ class Session extends Component {
     this.setState(state => ({
       users: pickBy(state.users, (user, key) => key !== uid),
     }));
+  }
+
+  // Ideally this should go into chat but
+  // then chat must be aware of room, works for now
+  onRoomChatMessage(message) {
+    const { onReceiveMessage } = this.props;
+    const { sessionId } = this.state;
+    onReceiveMessage(sessionId, message);
   }
 
   tryMountOwnMedia() {
@@ -85,24 +100,22 @@ class Session extends Component {
   }
 
   sendMessage(text) {
-    const { onReceiveMessage, selfUid } = this.props;
-    const { sessionId } = this.state;
+    const { selfUid } = this.props;
 
-    // Remove whitespace
-    const trimmed = text.trim();
+    const message = {
+      sender: selfUid,
+      text: text.trim(), // Remove whitespace
+      timestamp: new Date().getTime(),
+    };
 
-    if (trimmed) {
-      this.room.sendMessage(trimmed);
-      onReceiveMessage(sessionId, {
-        sender: selfUid,
-        text: trimmed,
-        timestamp: new Date().getTime(),
-      });
+    if (message.text) {
+      this.room.sendMessage(message);
+      this.onRoomChatMessage(message);
     }
   }
 
   render() {
-    const { chat, chatUsers, selfUid } = this.props;
+    const { selfUid } = this.props;
     const { users, sessionId } = this.state;
 
     return (
