@@ -129,11 +129,11 @@ class Session extends Component {
             toggleMute={() => this.room.toggleMute()}
           />
         </div>
+        {/* Session ID needs to be given to Chat to access correct chat */}
         <Chat
-          messages={chat[sessionId]}
           selfUid={selfUid}
+          sessionId={sessionId}
           sendMessage={text => this.sendMessage(text)}
-          users={chatUsers[sessionId]}
         />
       </div>
     );
@@ -141,22 +141,10 @@ class Session extends Component {
 }
 
 Session.propTypes = {
-  chat: PropTypes.objectOf(
-    PropTypes.arrayOf(
-      PropTypes.exact({
-        sender: PropTypes.string.isRequired,
-        text: PropTypes.string.isRequired,
-        timestamp: PropTypes.number.isRequired,
-      }),
-    ),
-  ).isRequired,
-  chatUsers: PropTypes.objectOf(
-    PropTypes.arrayOf(PropTypes.string),
-  ).isRequired,
-  onReceiveMessage: PropTypes.func.isRequired,
   token: PropTypes.string.isRequired,
   selfUid: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
+  onReceiveMessage: PropTypes.func.isRequired,
 };
 
 export default Session;
