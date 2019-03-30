@@ -25,7 +25,7 @@ class TextBox extends Component {
 
   render() {
     const { text } = this.state;
-    const { buttonLabel, placeholder } = this.props;
+    const { children, placeholder } = this.props;
 
     return (
       <InputGroup className="textbox">
@@ -41,7 +41,7 @@ class TextBox extends Component {
             disabled={!text}
             onClick={() => this.onClickSubmit()}
           >
-            {buttonLabel}
+            {children}
           </Button>
         </InputGroup.Append>
       </InputGroup>
@@ -52,12 +52,12 @@ class TextBox extends Component {
 TextBox.propTypes = {
   onSubmit: PropTypes.func.isRequired,
 
-  buttonLabel: PropTypes.string,
+  children: PropTypes.node,
   placeholder: PropTypes.string,
 };
 
 TextBox.defaultProps = {
-  buttonLabel: 'Submit',
+  children: 'Submit',
   placeholder: 'Enter text',
 };
 
