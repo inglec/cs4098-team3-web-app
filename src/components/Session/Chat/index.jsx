@@ -51,7 +51,6 @@ class Chat extends Component {
 
     return (
       <div className="chat">
-        <span>Session Chat</span>
         <div className="messages">
           <Scrollbar ref={ref => this.constructor.scrollToBottom(ref)}>
             <div>
