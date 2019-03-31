@@ -51,7 +51,6 @@ class Chat extends Component {
 
     return (
       <div className="chat">
-        <span>Session Chat</span>
         <div className="messages">
           <Scrollbar ref={ref => this.constructor.scrollToBottom(ref)}>
             <div>
@@ -83,7 +82,9 @@ class Chat extends Component {
             </div>
           </Scrollbar>
         </div>
-        <TextBox buttonLabel= <SendIcon /> placeholder="Send a message" onSubmit={sendMessage} />
+        <TextBox placeholder="Send a message" onSubmit={sendMessage}>
+          <SendIcon />
+        </TextBox>
       </div>
     );
   }
