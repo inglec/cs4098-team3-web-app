@@ -29,12 +29,12 @@ module.exports = {
     alias: {
       'app-root': __dirname,
       'app-components': path.resolve(__dirname, 'src/components'),
+      'app-config': path.resolve(__dirname, 'src/config.dev.json'),
       'app-containers': path.resolve(__dirname, 'src/containers'),
       'app-proptypes': path.resolve(__dirname, 'src/proptypes'),
       'app-redux': path.resolve(__dirname, 'src/redux'),
       'app-utils': path.resolve(__dirname, 'src/utils'),
       'test-data': path.resolve(__dirname, 'data/test'),
-      'app-config': path.resolve(__dirname, 'src/config.dev.json'),
     },
   },
   devServer: { historyApiFallback: true },

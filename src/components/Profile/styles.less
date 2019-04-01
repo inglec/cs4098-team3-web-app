@@ -1,0 +1,42 @@
+.profile {
+  .page-container {
+    display: flex;
+    justify-content: center;
+
+    .profile-container {
+      width: 700px;
+
+      .profile-form {
+        padding: 0 5px;
+
+        .profile-uneditable-container {
+          display: flex;
+
+          .profile-uneditable {
+            flex: auto;
+          }
+
+          .profile-avatar {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+
+            img {
+              border-radius: 10px;
+              box-shadow: 5px 5px 10px lightgrey;
+              height: 140px;
+              object-fit: cover;
+              width: 140px;
+            }
+          }
+        }
+
+        .profile-buttons {
+          button + button {
+            margin-left: 5px;
+          }
+        }
+      }
+    }
+  }
+}

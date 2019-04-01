@@ -9,51 +9,43 @@ import './styles';
 const isNurse = true;
 
 const Profile = ({ profile, peoplePresent }) => (
-  <div className="profile">
-
-    <div className="profile-top">
-
-      <Image className="profile-image" src={profile.imageSrc} roundedCircle fluid />
-      <div className="profile-side-text">
-
-        <p className="profile-name">{profile.displayName}</p>
-
+  <div className="review-profile">
+    <div className="review-profile-top">
+      <Image className="review-profile-image" src={profile.imageSrc} roundedCircle fluid />
+      <div className="review-profile-side-text">
+        <p className="review-profile-name">{profile.displayName}</p>
         <Card.Subtitle className="mb-2 text-muted">
           <SubtitleText profile={profile} peoplePresent={peoplePresent} />
         </Card.Subtitle>
-
       </div>
-
-
     </div>
-
-    <div className="profile-bottom">
-
-      <Card className="profile-card">
-        <Card.Body className="profile-card-body">
+    <div className="review-profile-bottom">
+      <Card className="review-profile-card">
+        <Card.Body className="review-profile-card-body">
           <Card.Link href="#">Contact</Card.Link>
           <Card.Link href="#">Profile</Card.Link>
-          {
-            isNurse && <Card.Link href="#">Medical Info.</Card.Link>
-          }
+          {isNurse ? <Card.Link href="#">Medical Info.</Card.Link> : null}
         </Card.Body>
       </Card>
-
     </div>
-
-
   </div>
 );
 
 
 const SubtitleText = ({ profile, peoplePresent }) => {
   if (!profile.present) {
-    return (<p>Note: absent</p>);
+    return <p>Note: absent</p>;
   }
   if (profile.ticks !== peoplePresent) {
-    return (<p>Note: ticks <b>{profile.ticks}</b></p>);
+    return (
+      <p>
+        Note: ticks
+        {' '}
+        <b>{profile.ticks}</b>
+      </p>
+    );
   }
-  return (null);
+  return null;
 };
 
 Profile.propTypes = {

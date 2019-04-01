@@ -59,7 +59,7 @@ class Review extends React.Component {
     } = this.state;
 
     return (
-      <div className="review">
+      <div className="page review">
 
         <div className="mainview">
           <Jumbotron className="video-container">

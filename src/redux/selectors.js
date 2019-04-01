@@ -7,6 +7,8 @@ export const getChat = state => state.chat;
 
 export const getSessions = state => state.sessions;
 
+export const getUser = state => state.user;
+
 // Array of unique users in chat for each session
 export const getChatUsers = createSelector(
   getChat,
