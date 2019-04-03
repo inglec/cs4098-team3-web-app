@@ -5,6 +5,7 @@ import React, { Component } from 'react';
 import Badge from 'react-bootstrap/Badge';
 import Card from 'react-bootstrap/Card';
 import Scrollbar from 'react-perfect-scrollbar';
+import SendIcon from 'react-feather/dist/icons/send';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 
 import TextBox from 'app-components/TextBox';
@@ -50,7 +51,6 @@ class Chat extends Component {
 
     return (
       <div className="chat">
-        <span>Session Chat</span>
         <div className="messages">
           <Scrollbar ref={ref => this.constructor.scrollToBottom(ref)}>
             <div>
@@ -82,7 +82,9 @@ class Chat extends Component {
             </div>
           </Scrollbar>
         </div>
-        <TextBox buttonLabel="Send" placeholder="Send a message" onSubmit={sendMessage} />
+        <TextBox placeholder="Send a message" onSubmit={sendMessage}>
+          <SendIcon />
+        </TextBox>
       </div>
     );
   }

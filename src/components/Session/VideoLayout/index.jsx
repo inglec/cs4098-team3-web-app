@@ -12,7 +12,7 @@ import React, { Component, createRef } from 'react';
 
 import { USER_ADD_MEDIA, USER_REMOVE_MEDIA } from 'app-utils/video/events';
 
-import Video from './Video';
+import Video from '../Video';
 
 import './styles';
 
@@ -66,7 +66,7 @@ class VideoLayout extends Component {
     this.eventListeners.push({ handler, name, ref });
   }
 
-  // Update state with new width / height of container
+  // Recalculate video layout with new width / height of container
   updateLayout() {
     if (this.layoutRef) {
       // Get width and height of `videolayout` container
@@ -115,7 +115,6 @@ class VideoLayout extends Component {
       const uidsByRow = chunk(uids, videosPerRow);
 
       // For each row, calculate how large a unit should be in pixels
-      // eslint-disable-next-line no-loop-func
       const rowHeight = Math.floor(this.layoutHeight / rowCount);
       const pixelsPerUnitByRow = uidsByRow.map(row => calculatePixelsPerUnit(row, rowHeight));
 

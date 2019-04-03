@@ -111,24 +111,26 @@ class Archives extends Component {
   render() {
     return (
       <div className="page archives">
-        <div className="archives-container">
-          <div className="archives-col">
-            <h5>Archived Sessions</h5>
-            <Card>
-              <Scrollbar>
-                {this.renderSessionList()}
-              </Scrollbar>
-            </Card>
-          </div>
-          <div className="archives-col">
-            <h5>Session Information</h5>
-            <Card>
-              <Scrollbar>
-                <Card.Body>
-                  {this.renderSelectedSession()}
-                </Card.Body>
-              </Scrollbar>
-            </Card>
+        <div className="page-container">
+          <div className="archives-container">
+            <div className="archives-col">
+              <h5>Archived Sessions</h5>
+              <Card>
+                <Scrollbar>
+                  {this.renderSessionList()}
+                </Scrollbar>
+              </Card>
+            </div>
+            <div className="archives-col">
+              <h5>Session Information</h5>
+              <Card>
+                <Scrollbar>
+                  <Card.Body>
+                    {this.renderSelectedSession()}
+                  </Card.Body>
+                </Scrollbar>
+              </Card>
+            </div>
           </div>
         </div>
       </div>

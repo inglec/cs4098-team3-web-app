@@ -7,6 +7,7 @@ import { ROOM_CLOSE, ROOM_USER_CONNECT } from 'app-utils/video/events';
 
 import Chat from './Chat';
 import Options from './Options';
+import Video from './Video';
 import VideoLayout from './VideoLayout';
 
 import './styles';
@@ -15,19 +16,15 @@ class Session extends Component {
   constructor(props) {
     super(props);
 
-    const { selfUid, token, url } = props;
-
     this.state = {
       sessionId: 'testsession', // FIXME: generate
       users: {},
     };
 
-    // Didn't put into state as we might not want to rerender whole page if
-    // media cuts out
-    this.ownAudioRef = createRef();
-    this.ownVideoRef = createRef();
-    this.ownAudioStream = null;
-    this.ownVideoStream = null;
+    this.onSelfAddMediaCallback = null;
+    this.onSelfRemoveMediaCallback = null;
+
+    const { selfUid, token, url } = props;
 
     this.room = new Room();
     this.room
@@ -36,20 +33,19 @@ class Session extends Component {
     this.room
       .join(url, selfUid, token)
       .then(({ audioStream, videoStream }) => {
-        this.ownAudioStream = audioStream;
-        this.ownVideoStream = videoStream;
-
-        // Refs may not have been set if not rendered yet
-        this.tryMountOwnMedia();
+        if (audioStream) {
+          this.onSelfAddMediaCallback({ mediakind: 'audio', mediastream: audioStream });
+        }
+        if (videoStream) {
+          this.onSelfAddMediaCallback({ mediakind: 'video', mediastream: videoStream });
+        }
       });
   }
 
-  componentDidMount() {
-    // Media elements may not have been retrieved before render
-    this.tryMountOwnMedia();
-  }
-
   componentWillUnmount() {
+    this.onSelfRemoveMediaCallback({ mediakind: 'audio' });
+    this.onSelfRemoveMediaCallback({ mediakind: 'video' });
+
     this.room.leave();
   }
 
@@ -74,14 +70,12 @@ class Session extends Component {
     }));
   }
 
-  tryMountOwnMedia() {
-    // Check if both the ref has been created and the media has been gotten
-    if (this.ownAudioStream && this.ownAudioRef.current) {
-      this.ownAudioRef.current.srcObject = this.ownAudioStream;
-    }
-    if (this.ownVideoStream && this.ownVideoRef.current) {
-      this.ownVideoRef.current.srcObject = this.ownVideoStream;
-    }
+  onSelfAddMedia(callback) {
+    this.onSelfAddMediaCallback = callback;
+  }
+
+  onSelfRemoveMedia(callback) {
+    this.onSelfRemoveMediaCallback = callback;
   }
 
   sendMessage(text) {
@@ -116,12 +110,19 @@ class Session extends Component {
             toggleMute={() => this.room.toggleMute()}
           />
         </div>
-        <Chat
-          messages={chat[sessionId]}
-          selfUid={selfUid}
-          sendMessage={text => this.sendMessage(text)}
-          users={chatUsers[sessionId]}
-        />
+        <div className="sidebar">
+          <Video
+            uid={selfUid}
+            onUserAddMedia={callback => this.onSelfAddMedia(callback)}
+            onUserRemoveMedia={callback => this.onSelfRemoveMedia(callback)}
+          />
+          <Chat
+            messages={chat[sessionId]}
+            selfUid={selfUid}
+            sendMessage={text => this.sendMessage(text)}
+            users={chatUsers[sessionId]}
+          />
+        </div>
       </div>
     );
   }
