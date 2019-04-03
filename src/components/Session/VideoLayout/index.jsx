@@ -8,7 +8,7 @@ import {
 import { isEmpty } from 'lodash/lang';
 import { mapValues } from 'lodash/object';
 import PropTypes from 'prop-types';
-import React, { Component, createRef } from 'react';
+import React, { Component } from 'react';
 
 import { USER_ADD_MEDIA, USER_REMOVE_MEDIA } from 'app-utils/video/events';
 
@@ -22,8 +22,8 @@ class VideoLayout extends Component {
 
     const { users } = props;
 
-    this.layoutRef = createRef();
-    this.mediaContainerRefs = mapValues(users, createRef);
+    this.layoutRef = null;
+    this.videoContainerRefs = mapValues(users, () => null);
 
     this.eventListeners = [];
 
@@ -44,20 +44,8 @@ class VideoLayout extends Component {
     this.updateLayout();
   }
 
-  setMediaContainerRef(uid, ref) {
-    this.mediaContainerRefs[uid] = ref;
-
-    if (ref) {
-      // Search for <video> element within media container <div>
-      const video = find(ref.children, child => child.tagName.toLowerCase() === 'video');
-      if (video) {
-        /**
-         * After `srcObject` is added to the <video> element, there is a short period of time
-         * where videoHeight and videoWidth will change. We need to listen for this and update.
-         */
-        this.addEventListener(video, 'loadedmetadata', () => this.updateVideos());
-      }
-    }
+  setVideoContainerRef(uid, ref) {
+    this.videoContainerRefs[uid] = ref;
   }
 
   // Bind event listener to target and store in array for easy listener removal
@@ -82,7 +70,7 @@ class VideoLayout extends Component {
   }
 
 
-  calculateVideoWidths() {
+  calculateVideoDimensions() {
     const { users } = this.props;
 
     /**
@@ -94,28 +82,44 @@ class VideoLayout extends Component {
     const uids = Object.keys(users);
 
     // Calculate width:height ratio for each video
-    const aspectRatios = mapValues(this.mediaContainerRefs, ({ clientHeight, clientWidth }) => (
-      clientWidth / clientHeight
-    ));
+    const aspectRatios = mapValues(this.videoContainerRefs, (videoContainerRef) => {
+      const mediaContainerRef = find(videoContainerRef.children, ({ className }) => (
+        className === 'media-container'
+      ));
+
+      if (mediaContainerRef) {
+        const videoRef = find(mediaContainerRef.children, ({ tagName }) => tagName === 'VIDEO');
+
+        if (videoRef) {
+          return videoRef.videoWidth / videoRef.videoHeight;
+        }
+      }
+
+      return NaN;
+    });
 
     // Calculate how many pixels a unit would equal in order to fit all videos in a row
-    const calculatePixelsPerUnit = (rowUids, height) => {
+    const calculatePixelsPerUnit = (rowUids, rowHeight) => {
       // Sum ratios (relative widths) of videos in row
       const unitWidth = rowUids.reduce((acc, uid) => acc + aspectRatios[uid], 0);
 
-      return Math.min(this.layoutWidth / unitWidth, height);
+      // Calculate height of videos to fill full width of row
+      const height = this.layoutWidth / unitWidth;
+
+      // Don't exceed row height
+      return Math.min(height, rowHeight);
     };
 
     // Increase the number of rows until there is no more vertical space
-    let addNewRow = true;
+    let addNewRow;
     let rowCount = 1;
-    while (addNewRow) {
+    do {
       // Split videos into array of rows
       const videosPerRow = Math.ceil(uids.length / rowCount);
       const uidsByRow = chunk(uids, videosPerRow);
 
       // For each row, calculate how large a unit should be in pixels
-      const rowHeight = Math.floor(this.layoutHeight / rowCount);
+      const rowHeight = this.layoutHeight / rowCount;
       const pixelsPerUnitByRow = uidsByRow.map(row => calculatePixelsPerUnit(row, rowHeight));
 
       // Add another row if there is space
@@ -129,14 +133,15 @@ class VideoLayout extends Component {
         rowCount += 1;
       } else {
         // Calculate new width of each video
-        return mapValues(this.mediaContainerRefs, (ref, uid) => {
+        return mapValues(this.videoContainerRefs, (ref, uid) => {
           const rowIndex = findIndex(uidsByRow, row => row.includes(uid));
-          const pixelsPerUnit = pixelsPerUnitByRow[rowIndex];
+          const height = pixelsPerUnitByRow[rowIndex];
+          const width = height * aspectRatios[uid];
 
-          return aspectRatios[uid] * pixelsPerUnit;
+          return { height, width };
         });
       }
-    }
+    } while (addNewRow);
 
     // ESLint doesn't realise that this will never execute
     return {};
@@ -147,15 +152,16 @@ class VideoLayout extends Component {
     // Check if refs have been obtained for all videos
     if (
       this.layoutRef
-      && !isEmpty(this.mediaContainerRefs)
-      && filter(this.mediaContainerRefs, ref => !ref).length === 0
+      && !isEmpty(this.videoContainerRefs)
+      && filter(this.videoContainerRefs, ref => !ref).length === 0
     ) {
       // Update width of each video
-      const videoWidths = this.calculateVideoWidths();
-      forEach(videoWidths, (videoWidth, uid) => {
+      const videoDimensions = this.calculateVideoDimensions();
+      forEach(videoDimensions, ({ height, width }, uid) => {
         // Set element styling
-        const { style } = this.mediaContainerRefs[uid];
-        style.width = `${videoWidth}px`;
+        const { style } = this.videoContainerRefs[uid];
+        style.height = `${height}px`;
+        style.width = `${width}px`;
       });
     }
   }
@@ -168,11 +174,17 @@ class VideoLayout extends Component {
         {
           map(users, (user, uid) => (
             <Video
+              displayName={null /* TODO */}
               key={uid}
-              uid={uid}
+              isMuted={false /* TODO */}
+              isTicked={false /* TODO */}
+              onLoadMetadata={() => this.updateVideos()}
+              onMute={() => console.log('mute', uid) /* TODO */}
+              onTick={() => console.log('tick', uid) /* TODO */}
               onUserAddMedia={callback => user.on(USER_ADD_MEDIA, callback)}
               onUserRemoveMedia={callback => user.on(USER_REMOVE_MEDIA, callback)}
-              setRef={ref => this.setMediaContainerRef(uid, ref)}
+              setVideoContainerRef={ref => this.setVideoContainerRef(uid, ref)}
+              uid={uid}
             />
           ))
         }

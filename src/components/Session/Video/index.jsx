@@ -1,104 +1,98 @@
-/* eslint-disable jsx-a11y/media-has-caption */
-
+import MuteIcon from 'react-feather/dist/icons/volume-x';
+import TickIcon from 'react-feather/dist/icons/check';
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React from 'react';
+
+import Media from './Media';
 
 import './styles';
 
-class Video extends Component {
-  constructor(props) {
-    super(props);
+const renderControls = (isMuted, onMute, isTicked, onTick, isSelfVideo) => {
+  const getControlClass = selected => `control-button${selected ? ' control-button-selected' : ''}`;
 
-    this.state = {
-      audioMedia: null,
-      videoMedia: null,
-    };
-
-    this.audioRef = null;
-    this.videoRef = null;
-
-    const { onUserAddMedia, onUserRemoveMedia } = props;
-
-    // Register callbacks with Room
-    onUserAddMedia(({ mediakind, mediastream }) => {
-      switch (mediakind) {
-        case 'audio': {
-          this.setState({ audioMedia: mediastream });
-          break;
-        }
-        case 'video': {
-          this.setState({ videoMedia: mediastream });
-          break;
-        }
-        default:
+  return (
+    <div className="video-overlay-controls">
+      <button type="button" className={getControlClass(isMuted)} onClick={onMute}>
+        <MuteIcon />
+      </button>
+      {
+        isSelfVideo
+          ? null
+          : (
+            <button type="button" className={getControlClass(isTicked)} onClick={onTick}>
+              <TickIcon />
+            </button>
+          )
       }
-    });
+    </div>
+  );
+};
 
-    onUserRemoveMedia(({ mediakind }) => {
-      switch (mediakind) {
-        case 'audio': {
-          this.setState({ audioMedia: null });
-          break;
-        }
-        case 'video': {
-          this.setState({ videoMedia: null });
-          break;
-        }
-        default:
-      }
-    });
-  }
-
-  setAudioRef(ref) {
-    if (ref) {
-      const { audioMedia } = this.state;
-
-      // eslint-disable-next-line no-param-reassign
-      ref.srcObject = audioMedia;
-    }
-
-    this.audioRef = ref;
-  }
-
-  setVideoRef(ref) {
-    if (ref) {
-      const { videoMedia } = this.state;
-
-      // eslint-disable-next-line no-param-reassign
-      ref.srcObject = videoMedia;
-    }
-
-    this.videoRef = ref;
-  }
-
-  render() {
-    const { audioMedia, videoMedia } = this.state;
-    const { setRef } = this.props;
-
-    // TODO: Render UID / display name
-    return (
-      <div className="media-container" ref={ref => setRef(ref)}>
-        {audioMedia ? <audio autoPlay ref={ref => this.setAudioRef(ref)} /> : null}
-        {videoMedia ? <video autoPlay ref={ref => this.setVideoRef(ref)} /> : null}
+const renderOverlay = (uid, displayName, isMuted, onMute, isTicked, onTick, isSelfVideo) => (
+  <div className="video-overlay">
+    <div className="video-overlay-row">
+      <div className="video-overlay-name">
+        {displayName ? `${displayName} (${uid})` : uid}
       </div>
-    );
-  }
-}
+    </div>
+    <div className="video-overlay-row">
+      {renderControls(isMuted, onMute, isTicked, onTick, isSelfVideo)}
+    </div>
+  </div>
+);
+
+const Video = (props) => {
+  const {
+    displayName,
+    isMuted,
+    isSelfVideo,
+    isTicked,
+    onLoadMetadata,
+    onMute,
+    onTick,
+    onUserAddMedia,
+    onUserRemoveMedia,
+    setVideoContainerRef,
+    uid,
+  } = props;
+
+  return (
+    <div className="video-container" ref={setVideoContainerRef}>
+      <Media
+        onLoadMetadata={onLoadMetadata}
+        onUserAddMedia={onUserAddMedia}
+        onUserRemoveMedia={onUserRemoveMedia}
+      />
+      {renderOverlay(uid, displayName, isMuted, onMute, isTicked, onTick, isSelfVideo)}
+    </div>
+  );
+};
 
 Video.propTypes = {
-  // TODO: Overlay uid on video
+  isMuted: PropTypes.bool.isRequired,
   uid: PropTypes.string.isRequired,
-  onUserAddMedia: PropTypes.func.isRequired,
-  onUserRemoveMedia: PropTypes.func.isRequired,
 
-  // TODO: Overlay display name on video if provided
   displayName: PropTypes.string,
-  setRef: PropTypes.func,
+  isTicked: PropTypes.bool,
+  onLoadMetadata: PropTypes.func,
+  onMute: PropTypes.func,
+  onTick: PropTypes.func,
+  onUserAddMedia: PropTypes.func,
+  onUserRemoveMedia: PropTypes.func,
+  isSelfVideo: PropTypes.bool,
+  setVideoContainerRef: PropTypes.func,
 };
 
 Video.defaultProps = {
   displayName: '',
-  setRef: () => {},
+  isSelfVideo: false,
+  isTicked: false,
+  onLoadMetadata: () => {},
+  onMute: () => {},
+  onTick: () => {},
+  onUserAddMedia: () => {},
+  onUserRemoveMedia: () => {},
+  setVideoContainerRef: () => {},
 };
 
 export default Video;
