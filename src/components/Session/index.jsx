@@ -38,23 +38,14 @@ class Session extends Component {
 
     this.room
       .join(url, selfUid, token)
-<<<<<<< HEAD
       .then(({ sessionId, audioStream, videoStream }) => {
-        this.setState(state => ({ ...state.users, sessionId }));
-        this.ownAudioStream = audioStream;
-        this.ownVideoStream = videoStream;
-
-        // Refs may not have been set if not rendered yet
-        this.tryMountOwnMedia();
-=======
-      .then(({ audioStream, videoStream }) => {
+        this.setState(state => ({ ...state, sessionId }));
         if (audioStream) {
           this.onSelfAddMediaCallback({ mediakind: 'audio', mediastream: audioStream });
         }
         if (videoStream) {
           this.onSelfAddMediaCallback({ mediakind: 'video', mediastream: videoStream });
         }
->>>>>>> master
       });
   }
 
@@ -87,31 +78,18 @@ class Session extends Component {
     }));
   }
 
-<<<<<<< HEAD
-  // Ideally this should go into chat but
-  // then chat must be aware of room, works for now
   onRoomChatMessage(message) {
     const { onReceiveMessage } = this.props;
     const { sessionId } = this.state;
     onReceiveMessage(sessionId, message);
   }
 
-  tryMountOwnMedia() {
-    // Check if both the ref has been created and the media has been gotten
-    if (this.ownAudioStream && this.ownAudioRef.current) {
-      this.ownAudioRef.current.srcObject = this.ownAudioStream;
-    }
-    if (this.ownVideoStream && this.ownVideoRef.current) {
-      this.ownVideoRef.current.srcObject = this.ownVideoStream;
-    }
-=======
   onSelfAddMedia(callback) {
     this.onSelfAddMediaCallback = callback;
   }
 
   onSelfRemoveMedia(callback) {
     this.onSelfRemoveMediaCallback = callback;
->>>>>>> master
   }
 
   sendMessage(text) {
@@ -144,14 +122,6 @@ class Session extends Component {
             toggleMute={() => this.room.toggleMute()}
           />
         </div>
-<<<<<<< HEAD
-        {/* Session ID needs to be given to Chat to access correct chat */}
-        <Chat
-          selfUid={selfUid}
-          sessionId={sessionId}
-          sendMessage={text => this.sendMessage(text)}
-        />
-=======
         <div className="sidebar">
           <Video
             uid={selfUid}
@@ -159,13 +129,11 @@ class Session extends Component {
             onUserRemoveMedia={callback => this.onSelfRemoveMedia(callback)}
           />
           <Chat
-            messages={chat[sessionId]}
             selfUid={selfUid}
+            sessionId={sessionId}
             sendMessage={text => this.sendMessage(text)}
-            users={chatUsers[sessionId]}
           />
         </div>
->>>>>>> master
       </div>
     );
   }
