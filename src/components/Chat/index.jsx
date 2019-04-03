@@ -87,7 +87,7 @@ class Chat extends Component {
 Chat.propTypes = {
   selfUid: PropTypes.string.isRequired,
   sendMessage: PropTypes.func.isRequired,
-  sessionId: PropTypes.string.isRequired, // It is used in mapStateToProps
+  sessionId: PropTypes.string,
   messages: PropTypes.arrayOf(
     PropTypes.exact({
       text: PropTypes.string.isRequired,

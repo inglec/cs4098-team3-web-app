@@ -19,6 +19,7 @@ class Room {
   constructor() {
     this.msRoom = new MediasoupRoom();
     this.peers = new Map();
+    this.sessionId = null;
     this.socket = null;
     this.isMuted = false;
     this.transports = { recv: null, send: null };
@@ -51,7 +52,6 @@ class Room {
           recv: this.msRoom.createTransport('recv'),
           send: this.msRoom.createTransport('send'),
         };
-
         // Setup all the handles for every other peer already in the room
         peers.forEach(peer => this.onRoomNewPeer(peer));
       })
@@ -84,7 +84,7 @@ class Room {
           videoStream.addTrack(video);
         }
 
-        return Promise.resolve({ audioStream, videoStream });
+        return Promise.resolve({ sessionId: this.sessionId, audioStream, videoStream });
       });
   }
 
@@ -126,7 +126,6 @@ class Room {
       appData: message,
     };
     this.socket.emit(MEDIASOUP_NOTIFICATION, messageNotification);
-
   }
 
   toggleMute() {
@@ -155,6 +154,9 @@ class Room {
       if (err) {
         errback(err);
       } else {
+        if (response && response.sessionId) {
+          this.sessionId = response.sessionId;
+        }
         callback(response);
       }
     });

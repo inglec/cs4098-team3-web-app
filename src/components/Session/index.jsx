@@ -22,7 +22,7 @@ class Session extends Component {
     const { selfUid, token, url } = props;
 
     this.state = {
-      sessionId: 'testsession', // FIXME: generate
+      sessionId: null,
       users: {},
     };
 
@@ -41,7 +41,8 @@ class Session extends Component {
 
     this.room
       .join(url, selfUid, token)
-      .then(({ audioStream, videoStream }) => {
+      .then(({ sessionId, audioStream, videoStream }) => {
+        this.setState(state => ({ ...state.users, sessionId }));
         this.ownAudioStream = audioStream;
         this.ownVideoStream = videoStream;
 

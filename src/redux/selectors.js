@@ -27,6 +27,6 @@ export const getChatUsers = createSelector(
 // Might not be the correct way to do it
 // But the other options are index into them in mapStateToProps or in the component
 // Here it's more reusable
-export const getSessionMessages = (state, sessionId) => state.chat[sessionId];
+export const getSessionMessages = (state, sessionId) => state.chat[sessionId] || [];
 
-export const getSessionUsers = (state, sessionId) => getChatUsers(state)[sessionId];
+export const getSessionUsers = (state, sessionId) => getChatUsers(state)[sessionId] || [];
