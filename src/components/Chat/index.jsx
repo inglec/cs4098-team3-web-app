@@ -41,8 +41,9 @@ class Chat extends Component {
     // Create a new colour if there is a new chatUser
     userUids
       .filter(uid => !(uid in this.colourMap))
-      /* eslint-disable no-return-assign */
-      .forEach(uid => this.colourMap[uid] = randomColor());
+      .forEach((uid) => {
+        this.colourMap[uid] = randomColor();
+      });
 
     return (
       <div className="chat">

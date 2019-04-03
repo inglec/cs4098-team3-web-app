@@ -8,7 +8,6 @@ const mapStateToProps = (state, ownProps) => {
   const messages = getSessionMessages(state, ownProps.sessionId);
   const userUids = getSessionUsers(state, ownProps.sessionId);
   return {
-    ...ownProps,
     messages,
     userUids,
   };

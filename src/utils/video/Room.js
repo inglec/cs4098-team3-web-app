@@ -6,6 +6,7 @@ import {
   NEW_PEER,
   MEDIASOUP_NOTIFICATION,
   MEDIASOUP_REQUEST,
+  METHOD_CHAT_MESSAGE,
   NOTIFY,
   REQUEST,
   ROOM_CLOSE,
@@ -89,7 +90,7 @@ class Room {
   }
 
   notificationHandler(notification) {
-    if (notification.method === 'chat-message') {
+    if (notification.method === METHOD_CHAT_MESSAGE) {
       this.handleIncomingChatMessage(notification.appData);
     }
     this.msRoom.receiveNotification(notification);
@@ -116,11 +117,10 @@ class Room {
     }
   }
 
-  // eslint-disable-next-line
   sendMessage(message) {
     // { selfUid, text, timestamp }
     const messageNotification = {
-      method: 'chat-message',
+      method: METHOD_CHAT_MESSAGE,
       target: 'room',
       notification: true,
       appData: message,

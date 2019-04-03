@@ -7,6 +7,7 @@ export const NOTIFY = 'notify';
 export const MEDIASOUP_NOTIFICATION = 'mediasoup-notification';
 export const MEDIASOUP_REQUEST = 'mediasoup-request';
 
+export const METHOD_CHAT_MESSAGE = 'chat-message';
 /**
  * Events:
  * - When the room closes (locally or remotely)
