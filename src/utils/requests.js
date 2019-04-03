@@ -1,10 +1,9 @@
 // import axios from 'axios';
-import { patients } from 'app-root/data/test/patients';
-import { video } from 'app-root/data/test/videoinfo'
+
+import { patients } from 'test-data/patients';
+import { video } from 'test-data/videoinfo';
 
 const defaultPicSrc = 'http://localhost:8080/data/test/nopic.png';
-// TODO
-// const AUTH_SERVER_URL = 'https://';
 
 // TODO: Actually do authentication.
 export const authenticate = (uid, password) => (
@@ -17,6 +16,19 @@ export const authenticate = (uid, password) => (
         reject(Error('bad credentials'));
       }
     }, 2000);
+  })
+);
+
+// TODO: Actually send POST request to API server
+export const updateProfile = (token, fields) => (
+  new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (token && fields) {
+        resolve();
+      } else {
+        reject(Error('missing fields'));
+      }
+    }, 500);
   })
 );
 

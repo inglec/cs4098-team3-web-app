@@ -68,10 +68,14 @@ const chat = (state = {}, action) => {
   }
 };
 
+// TODO
 const sessions = (state = {}) => state;
+
+const user = (state = {}) => state;
 
 export default combineReducers({
   auth,
   chat,
   sessions,
+  user,
 });
