@@ -1,6 +1,6 @@
 import { pickBy } from 'lodash/object';
 import PropTypes from 'prop-types';
-import React, { Component, createRef } from 'react';
+import React, { Component } from 'react';
 
 import Room from 'app-utils/video/Room';
 import { ROOM_CLOSE, ROOM_USER_CONNECT } from 'app-utils/video/events';
@@ -33,18 +33,22 @@ class Session extends Component {
     this.room
       .join(url, selfUid, token)
       .then(({ audioStream, videoStream }) => {
-        if (audioStream) {
-          this.onSelfAddMediaCallback({ mediakind: 'audio', mediastream: audioStream });
-        }
-        if (videoStream) {
-          this.onSelfAddMediaCallback({ mediakind: 'video', mediastream: videoStream });
+        if (this.onSelfAddMediaCallback) {
+          if (audioStream) {
+            this.onSelfAddMediaCallback({ mediakind: 'audio', mediastream: audioStream });
+          }
+          if (videoStream) {
+            this.onSelfAddMediaCallback({ mediakind: 'video', mediastream: videoStream });
+          }
         }
       });
   }
 
   componentWillUnmount() {
-    this.onSelfRemoveMediaCallback({ mediakind: 'audio' });
-    this.onSelfRemoveMediaCallback({ mediakind: 'video' });
+    if (this.onSelfRemoveMediaCallback) {
+      this.onSelfRemoveMediaCallback({ mediakind: 'audio' });
+      this.onSelfRemoveMediaCallback({ mediakind: 'video' });
+    }
 
     this.room.leave();
   }
@@ -112,9 +116,13 @@ class Session extends Component {
         </div>
         <div className="sidebar">
           <Video
-            uid={selfUid}
+            displayName="Me"
+            isMuted={this.room.isMuted}
+            isSelfVideo
+            onMute={() => console.log('mute: self') /* TODO */}
             onUserAddMedia={callback => this.onSelfAddMedia(callback)}
             onUserRemoveMedia={callback => this.onSelfRemoveMedia(callback)}
+            uid={selfUid}
           />
           <Chat
             messages={chat[sessionId]}
