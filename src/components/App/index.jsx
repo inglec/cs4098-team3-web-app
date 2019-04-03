@@ -6,12 +6,12 @@ import uuidv4 from 'uuid/v4';
 
 import Archives from 'app-components/Archives';
 import NotFound from 'app-components/NotFound';
-import Profile from 'app-components/Profile';
+import VideoReview from 'app-components/Review';
 import Home from 'app-containers/Home';
 import Login from 'app-containers/Login';
 import Navbar from 'app-containers/Navbar';
+import Profile from 'app-containers/Profile';
 import Session from 'app-containers/Session';
-import VideoReview from 'app-components/Review';
 
 import './styles';
 

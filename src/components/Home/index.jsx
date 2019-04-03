@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router-dom';
+
 import SessionList from './SessionList';
+
 import './styles';
 
 const createSessionLists = (sessions, push) => {
@@ -10,7 +12,7 @@ const createSessionLists = (sessions, push) => {
   const futureSessions = sessions.filter(session => !session.active && !session.complete);
 
   return (
-    <div>
+    <div className="page-container">
       <SessionList sessions={activeSessions} title="Active Sessions" push={push} path="/session" />
       <SessionList sessions={reviewSessions} title="Past Sessions" push={push} path="/review" />
       <SessionList sessions={futureSessions} title="Future Sessions" push={push} path="" />

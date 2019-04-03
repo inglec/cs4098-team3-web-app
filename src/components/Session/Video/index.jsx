@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 
 import PropTypes from 'prop-types';
-import React, { Component, createRef } from 'react';
+import React, { Component } from 'react';
 
 import './styles';
 
@@ -9,11 +9,17 @@ class Video extends Component {
   constructor(props) {
     super(props);
 
-    this.audioRef = createRef();
-    this.videoRef = createRef();
+    this.state = {
+      audioMedia: null,
+      videoMedia: null,
+    };
+
+    this.audioRef = null;
+    this.videoRef = null;
 
     const { onUserAddMedia, onUserRemoveMedia } = props;
 
+    // Register callbacks with Room
     onUserAddMedia(({ mediakind, mediastream }) => {
       switch (mediakind) {
         case 'audio': {
@@ -41,11 +47,6 @@ class Video extends Component {
         default:
       }
     });
-
-    this.state = {
-      audioMedia: null,
-      videoMedia: null,
-    };
   }
 
   setAudioRef(ref) {
@@ -85,10 +86,12 @@ class Video extends Component {
 }
 
 Video.propTypes = {
+  // TODO: Overlay uid on video
   uid: PropTypes.string.isRequired,
   onUserAddMedia: PropTypes.func.isRequired,
   onUserRemoveMedia: PropTypes.func.isRequired,
 
+  // TODO: Overlay display name on video if provided
   displayName: PropTypes.string,
   setRef: PropTypes.func,
 };

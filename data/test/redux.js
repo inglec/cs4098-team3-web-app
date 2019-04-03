@@ -13,6 +13,7 @@ class Time {
 }
 
 const time = new Time();
+
 const auth = { uid: uuidv4().substring(0, 8), token: 'testtoken' };
 
 // const chat = {
@@ -99,9 +100,19 @@ const sessions = [
   },
 ];
 
+const user = {
+  avatarUrl: 'http://lb-warehousing.co.uk/wp-content/uploads/2015/11/Untitled-1_021-570x570-570x570.jpg',
+  bio: 'I love coding',
+  email: 'joebloggs@gmail.com',
+  name: 'Joe Bloggs',
+  phone: '98023409',
+  userType: 'patient',
+};
+
 
 export default {
   auth,
   chat,
   sessions,
+  user,
 };
