@@ -30,14 +30,14 @@ class Archives extends Component {
   }
 
   renderSessionList() {
-    const { sessions } = this.props;
+    const { sessions, user } = this.props;
     const { selectedSessionId } = this.state;
 
     return (
       <ListGroup>
         {
           map(sessions, (session, sessionId) => {
-            const status = sessions[sessionId].review
+            const status = user.userType === 'admin' && sessions[sessionId].review
               ? <Badge variant="success" className="status">reviewed</Badge>
               : null;
 
@@ -58,7 +58,12 @@ class Archives extends Component {
   }
 
   renderSelectedSession() {
-    const { groups, history, sessions } = this.props;
+    const {
+      groups,
+      history,
+      sessions,
+      user,
+    } = this.props;
     const { selectedSessionId } = this.state;
     const selectedSession = sessions[selectedSessionId];
 
@@ -85,6 +90,7 @@ class Archives extends Component {
 
     const { users } = groups[groupId];
     const confirmed = review.confirmed || [];
+    const isAdmin = user.userType === 'admin';
 
     return (
       <Form>
@@ -101,13 +107,13 @@ class Archives extends Component {
           <Form.Control type="text" value={durationString} disabled />
         </Form.Group>
         <Form.Group>
-          <Form.Label>Review</Form.Label>
+          <Form.Label>{isAdmin ? 'Review' : 'Attendance' }</Form.Label>
           <ListGroup>
             {
-              users.map(user => (
-                <ListGroup.Item key={user} disabled={!Object.keys(attendance).includes(user)}>
-                  {user}
-                  {confirmed.includes(user) ? <CheckIcon className="icon" /> : null}
+              users.map(uid => (
+                <ListGroup.Item key={uid} disabled={!Object.keys(attendance).includes(uid)}>
+                  {uid}
+                  {isAdmin && confirmed.includes(uid) ? <CheckIcon className="icon" /> : null}
                 </ListGroup.Item>
               ))
             }
@@ -165,6 +171,9 @@ Archives.propTypes = {
 
   // FIXME
   sessions: PropTypes.object.isRequired,
+
+  // FIXME:
+  user: PropTypes.object.isRequired,
 };
 
 export default Archives;

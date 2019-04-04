@@ -124,6 +124,9 @@ const users = {
     phone: '',
     userType: 'patient',
   },
+  testadmin: {
+    userType: 'admin',
+  },
 };
 
 export default {
