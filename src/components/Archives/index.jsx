@@ -9,7 +9,6 @@ import Form from 'react-bootstrap/Form';
 import ListGroup from 'react-bootstrap/ListGroup';
 import CheckIcon from 'react-feather/dist/icons/check-circle';
 import Scrollbar from 'react-perfect-scrollbar';
-import 'react-perfect-scrollbar/dist/css/styles.css';
 
 import './styles';
 
