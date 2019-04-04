@@ -5,6 +5,8 @@ export const getAuth = state => state.auth;
 
 export const getChat = state => state.chat;
 
+export const getGroups = state => state.groups;
+
 export const getSessions = state => state.sessions;
 
 export const getUsers = state => state.users;
