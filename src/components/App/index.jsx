@@ -4,9 +4,9 @@ import PrivateRoute from 'react-private-route';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import uuidv4 from 'uuid/v4';
 
-import Archives from 'app-components/Archives';
 import NotFound from 'app-components/NotFound';
 import VideoReview from 'app-components/Review';
+import Archives from 'app-containers/Archives';
 import Home from 'app-containers/Home';
 import Login from 'app-containers/Login';
 import Navbar from 'app-containers/Navbar';

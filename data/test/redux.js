@@ -45,7 +45,7 @@ const sessions = {
     },
     review: {
       reviewedBy: 'testadmin',
-      confirmed: ['inglec'],
+      confirmed: ['ebergman', 'inglec'],
     },
   },
   pastsession2: {
@@ -67,6 +67,10 @@ const sessions = {
         leftAt: time - DAY * 2 + MINUTE * 37,
         tickedAt: time - DAY * 2 + MINUTE * 13,
       },
+    },
+    review: {
+      reviewedBy: 'testadmin',
+      confirmed: ['asmirnov', 'conevin'],
     },
   },
 };

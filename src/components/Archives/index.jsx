@@ -8,7 +8,6 @@ import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import ListGroup from 'react-bootstrap/ListGroup';
 import CheckIcon from 'react-feather/dist/icons/check-circle';
-import XIcon from 'react-feather/dist/icons/x-circle';
 import Scrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 
@@ -24,7 +23,10 @@ class Archives extends Component {
   }
 
   setSelectedSession(sessionId) {
-    this.setState({ selectedSessionId: sessionId });
+    // Deselect session ID if already selected
+    this.setState(({ selectedSessionId }) => ({
+      selectedSessionId: selectedSessionId === sessionId ? '' : sessionId,
+    }));
   }
 
   renderSessionList() {
@@ -35,7 +37,7 @@ class Archives extends Component {
       <ListGroup>
         {
           map(sessions, (session, sessionId) => {
-            const status = sessions[sessionId].wasReviewed
+            const status = sessions[sessionId].review
               ? <Badge variant="success" className="status">reviewed</Badge>
               : null;
 
@@ -56,7 +58,7 @@ class Archives extends Component {
   }
 
   renderSelectedSession() {
-    const { group: { members }, history, sessions } = this.props;
+    const { groups, history, sessions } = this.props;
     const { selectedSessionId } = this.state;
     const selectedSession = sessions[selectedSessionId];
 
@@ -64,46 +66,61 @@ class Archives extends Component {
       return <div className="unselected">Select a session from the left-hand pane to begin</div>;
     }
 
-    const formatDate = time => moment(time).format('ddd, Do MMM YYYY, HH:mm:ss');
+    const {
+      attendance = {},
+      endTime,
+      groupId,
+      review = {},
+      startTime,
+    } = selectedSession;
 
-    const startTime = formatDate(selectedSession.startTime);
-    const endTime = formatDate(selectedSession.endTime);
-    const duration = moment.duration(selectedSession.endTime - selectedSession.startTime).minutes();
+    const formatDate = time => moment(time).format('ddd, Do MMM YYYY, HH:mm:ss');
+    const startTimeString = formatDate(startTime);
+    const endTimeString = formatDate(endTime);
+
+    const duration = moment.duration(endTime - startTime);
+    const hours = duration.hours();
+    const minutes = duration.minutes();
+    const durationString = `${hours ? `${hours}hr ` : ''}${minutes}m`;
+
+    const { users } = groups[groupId];
+    const confirmed = review.confirmed || [];
 
     return (
       <Form>
         <Form.Group>
           <Form.Label>Start time</Form.Label>
-          <Form.Control type="text" value={startTime} disabled />
+          <Form.Control type="text" value={startTimeString} disabled />
         </Form.Group>
         <Form.Group>
           <Form.Label>End time</Form.Label>
-          <Form.Control type="text" value={endTime} disabled />
+          <Form.Control type="text" value={endTimeString} disabled />
         </Form.Group>
         <Form.Group>
           <Form.Label>Duration</Form.Label>
-          <Form.Control type="text" value={`${duration} minutes`} disabled />
+          <Form.Control type="text" value={durationString} disabled />
         </Form.Group>
         <Form.Group>
-          <Form.Label>User attendance</Form.Label>
+          <Form.Label>Review</Form.Label>
           <ListGroup>
             {
-              members.map((member) => {
-                const icon = selectedSession.users.includes(member)
-                  ? <CheckIcon className="icon check" />
-                  : <XIcon className="icon x" />;
-
-                return (
-                  <ListGroup.Item key={member}>
-                    {icon}
-                    {member}
-                  </ListGroup.Item>
-                );
-              })
+              users.map(user => (
+                <ListGroup.Item key={user} disabled={!Object.keys(attendance).includes(user)}>
+                  {user}
+                  {confirmed.includes(user) ? <CheckIcon className="icon" /> : null}
+                </ListGroup.Item>
+              ))
             }
           </ListGroup>
         </Form.Group>
-        <Button onClick={() => history.push('/review')}>View Session Archive</Button>
+        <Button
+          block
+          size="md"
+          variant="outline-primary"
+          onClick={() => history.push('/review')}
+        >
+          View Session Archive
+        </Button>
       </Form>
     );
   }
@@ -140,49 +157,14 @@ class Archives extends Component {
 
 // TODO: Make required
 Archives.propTypes = {
+  // FIXME
+  groups: PropTypes.object.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }).isRequired,
 
-  group: PropTypes.exact({
-    admin: PropTypes.string.isRequired,
-    members: PropTypes.arrayOf(PropTypes.string).isRequired,
-  }),
-  sessions: PropTypes.objectOf(
-    PropTypes.exact({
-      endTime: PropTypes.number.isRequired,
-      startTime: PropTypes.number.isRequired,
-      users: PropTypes.arrayOf(PropTypes.string).isRequired,
-      wasReviewed: PropTypes.bool.isRequired,
-    }),
-  ),
-};
-
-// TODO: Remove
-Archives.defaultProps = {
-  group: {
-    admin: 'admin',
-    members: [
-      'alex',
-      'chris',
-      'ciaran',
-      'conal',
-      'conor',
-      'eddie',
-    ],
-  },
-  sessions: (() => {
-    const object = {};
-    for (let i = 20; i > 0; i -= 1) {
-      object[`session${i}`] = {
-        users: ['ciaran', 'eddie', 'conal'],
-        startTime: new Date().getTime() - Math.floor(Math.random() * 1000000),
-        endTime: new Date().getTime(),
-        wasReviewed: Math.random() < 0.7,
-      };
-    }
-    return object;
-  })(),
+  // FIXME
+  sessions: PropTypes.object.isRequired,
 };
 
 export default Archives;

@@ -5,6 +5,7 @@
     display: flex;
     flex-direction: row;
     flex: auto;
+    height: 100%;
     padding: 10px;
 
     .archives-col {
@@ -20,20 +21,21 @@
       .card {
         flex: auto;
 
-        .icon {
-          margin-right: 5px;
+        .list-group-item {
+          cursor: pointer;
 
-          &.check {
+          &.disabled {
+            background-color: whitesmoke;
+          }
+
+          .icon {
             color: green;
+            margin-left: 5px;
           }
 
-          &.x {
-            color: red;
+          .status {
+            margin-left: 10px;
           }
-        }
-
-        .status {
-          margin-left: 10px;
         }
 
         .unselected {
