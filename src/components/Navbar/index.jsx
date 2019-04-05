@@ -3,18 +3,18 @@ import React from 'react';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-import SettingsIcon from 'react-feather/dist/icons/settings';
+import ArchivesIcon from 'react-feather/dist/icons/archive';
+import GroupsIcon from 'react-feather/dist/icons/users';
 import HomeIcon from 'react-feather/dist/icons/home';
-import UserIcon from 'react-feather/dist/icons/user';
-import ArchiveIcon from 'react-feather/dist/icons/archive';
-import LOIcon from 'react-feather/dist/icons/log-out';
+import LogoutIcon from 'react-feather/dist/icons/log-out';
+import ProfileIcon from 'react-feather/dist/icons/user';
+import SettingsIcon from 'react-feather/dist/icons/settings';
 import { withRouter } from 'react-router-dom';
 
+import IconedText from 'app-components/IconedText';
+
 const renderNavLink = (href, linkText, push, pathname) => (
-  <Nav.Link
-    active={href === pathname}
-    onClick={() => push(href)}
-  >
+  <Nav.Link active={href === pathname} onClick={() => push(href)}>
     {linkText}
   </Nav.Link>
 );
@@ -23,9 +23,13 @@ const renderNavDropdown = (uid, push, onClickLogout) => (
   uid
     ? (
       <NavDropdown title={uid} alignRight>
-        <NavDropdown.Item onClick={() => push('settings')}>Settings <SettingsIcon /></NavDropdown.Item>
+        <NavDropdown.Item onClick={() => push('settings')}>
+          <IconedText icon={SettingsIcon}>Settings</IconedText>
+        </NavDropdown.Item>
         <NavDropdown.Divider />
-        <NavDropdown.Item onClick={onClickLogout}>Log Out <LOIcon /></NavDropdown.Item>
+        <NavDropdown.Item onClick={onClickLogout}>
+          <IconedText icon={LogoutIcon}>Log Out</IconedText>
+        </NavDropdown.Item>
       </NavDropdown>
     )
     : <Nav.Link onClick={() => push('/login')}>Log In</Nav.Link>
@@ -37,6 +41,7 @@ const AppNavbar = (props) => {
     location: { pathname },
     onClickLogout,
     uid,
+    user,
   } = props;
 
   return (
@@ -46,9 +51,33 @@ const AppNavbar = (props) => {
       <Navbar.Collapse id="basic-navbar-nav">
         {/* Left-aligned section */}
         <Nav className="mr-auto">
-          {renderNavLink('/', <HomeIcon />, push, pathname)}
-          {renderNavLink('/profile', <UserIcon />, push, pathname)}
-          {renderNavLink('/archives', <ArchiveIcon />, push, pathname)}
+          {renderNavLink('/', <IconedText icon={HomeIcon}>Home</IconedText>, push, pathname)}
+          {
+            renderNavLink(
+              '/profile',
+              <IconedText icon={ProfileIcon}>My Profile</IconedText>,
+              push,
+              pathname,
+            )
+          }
+          {
+            renderNavLink(
+              '/archives',
+              <IconedText icon={ArchivesIcon}>Archives</IconedText>,
+              push,
+              pathname,
+            )
+          }
+          {
+            user.userType === 'admin'
+              ? renderNavLink(
+                '/groups',
+                <IconedText icon={GroupsIcon}>Group Management</IconedText>,
+                push,
+                pathname,
+              )
+              : null
+          }
         </Nav>
 
         { /* Right-aligned section */ }
@@ -60,14 +89,24 @@ const AppNavbar = (props) => {
 
 // React router props
 AppNavbar.propTypes = {
-  history: PropTypes.shape({ push: PropTypes.func.isRequired }).isRequired,
-  location: PropTypes.shape({ pathname: PropTypes.string.isRequired }).isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func.isRequired,
+  }).isRequired,
+  location: PropTypes.shape({
+    pathname: PropTypes.string.isRequired,
+  }).isRequired,
   onClickLogout: PropTypes.func.isRequired,
 
   uid: PropTypes.string,
+
+  // FIXME
+  user: PropTypes.object,
 };
 
-AppNavbar.defaultProps = { uid: null };
+AppNavbar.defaultProps = {
+  uid: null,
+  user: null,
+};
 
 // Wrap component in withRouter to access React Router props
 export default withRouter(AppNavbar);
