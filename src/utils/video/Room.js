@@ -21,6 +21,7 @@ class Room {
     this.socket = null;
     this.isMuted = false;
     this.transports = { recv: null, send: null };
+    this.mediastream = null;
 
     // Events that can be listened for
     this.listeners = {
@@ -60,6 +61,8 @@ class Room {
         navigator.mediaDevices.getUserMedia({ audio: true, video: true })
       ))
       .then((mediastream) => {
+        this.mediastream = mediastream;
+
         // Create references to mediastreams which may be assigned to if tracks exist
         let audioStream = null;
         let videoStream = null;
@@ -90,6 +93,9 @@ class Room {
 
   leave() {
     this.msRoom.leave();
+    if (this.mediastream) {
+      this.mediastream.getTracks().forEach(track => track.stop());
+    }
   }
 
   on(eventName, callback) {
