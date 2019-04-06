@@ -7,6 +7,7 @@ export const NOTIFY = 'notify';
 export const MEDIASOUP_NOTIFICATION = 'mediasoup-notification';
 export const MEDIASOUP_REQUEST = 'mediasoup-request';
 
+export const METHOD_CHAT_MESSAGE = 'chat-message';
 /**
  * Events:
  * - When the room closes (locally or remotely)
@@ -14,10 +15,14 @@ export const MEDIASOUP_REQUEST = 'mediasoup-request';
  *
  * - When a new user joins the room
  *   room-userconnect: { user }
+ *
+ * - When a new chat message is sent into the room
+ *   room-chat-message
  */
 
 export const ROOM_CLOSE = 'room-close';
 export const ROOM_USER_CONNECT = 'room-userconnect';
+export const ROOM_CHAT_MESSAGE = 'room-chat-message';
 
 /**
  * Events:

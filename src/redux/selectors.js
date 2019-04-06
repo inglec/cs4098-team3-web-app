@@ -14,12 +14,16 @@ export const getUser = createSelector(getUsers, getAuth, (users, { uid }) => use
 // Array of unique users in chat for each session
 export const getChatUsers = createSelector(
   getChat,
-  chat => (
-    mapValues(chat, (session) => {
+  chats => (
+    mapValues(chats, (chat) => {
       const uids = new Set();
-      session.forEach(message => uids.add(message.sender));
+      chat.forEach(message => uids.add(message.sender));
 
       return Array.from(uids);
     })
   ),
 );
+
+export const getSessionMessages = (state, sessionId) => state.chat[sessionId] || [];
+
+export const getSessionUsers = (state, sessionId) => getChatUsers(state)[sessionId] || [];
