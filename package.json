@@ -33,6 +33,7 @@
     "mediasoup-client": "^2.4.9",
     "moment": "^2.24.0",
     "prop-types": "^15.6.2",
+    "query-string": "^6.4.2",
     "randomcolor": "^0.5.4",
     "react": "^16.7.0",
     "react-bootstrap": "^1.0.0-beta.5",

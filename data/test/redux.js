@@ -1,4 +1,12 @@
-const auth = { uid: 'inglec', token: 'testtoken' };
+import { parse } from 'query-string';
+
+// Get "uid" from search params
+const { uid } = parse(window.location.search);
+
+const auth = {
+  uid: uid || 'inglec',
+  token: 'testtoken',
+};
 
 const chat = {
   testsession: [],
