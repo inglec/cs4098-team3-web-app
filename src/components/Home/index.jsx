@@ -7,12 +7,13 @@ import SessionList from './SessionList';
 import './styles';
 
 const createSessionLists = (sessions, push) => {
-  const activeSessions = sessions.filter(session => session.active);
-  const reviewSessions = sessions.filter(session => !session.active && session.complete);
-  const futureSessions = sessions.filter(session => !session.active && !session.complete);
+  const activeSessions = []; //sessions.filter(session => session.active);
+  const reviewSessions = []; //sessions.filter(session => !session.active && session.complete);
+  const futureSessions = []; //sessions.filter(session => !session.active && !session.complete);
 
   return (
     <div className="page-container">
+      <Link to="/session">Temp link to session</Link>
       <SessionList sessions={activeSessions} title="Active Sessions" push={push} path="/session" />
       <SessionList sessions={reviewSessions} title="Past Sessions" push={push} path="/review" />
       <SessionList sessions={futureSessions} title="Future Sessions" push={push} path="" />
