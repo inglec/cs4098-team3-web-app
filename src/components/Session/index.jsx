@@ -2,10 +2,14 @@ import { pickBy } from 'lodash/object';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 
+import Chat from 'app-containers/Chat'
 import Room from 'app-utils/video/Room';
-import { ROOM_CLOSE, ROOM_USER_CONNECT } from 'app-utils/video/events';
+import {
+  ROOM_CLOSE,
+  ROOM_USER_CONNECT,
+  ROOM_CHAT_MESSAGE,
+ } from 'app-utils/video/events';
 
-import Chat from './Chat';
 import Options from './Options';
 import Video from './Video';
 import VideoLayout from './VideoLayout';
@@ -17,7 +21,7 @@ class Session extends Component {
     super(props);
 
     this.state = {
-      sessionId: 'testsession', // FIXME: generate
+      sessionId: null,
       users: {},
     };
 
@@ -29,10 +33,13 @@ class Session extends Component {
     this.room = new Room();
     this.room
       .on(ROOM_CLOSE, () => this.onRoomClose())
-      .on(ROOM_USER_CONNECT, user => this.onUserConnect(user));
+      .on(ROOM_USER_CONNECT, user => this.onUserConnect(user))
+      .on(ROOM_CHAT_MESSAGE, message => this.onRoomChatMessage(message));
+
     this.room
       .join(url, selfUid, token)
-      .then(({ audioStream, videoStream }) => {
+      .then(({ sessionId, audioStream, videoStream }) => {
+        this.setState({ sessionId });
         if (this.onSelfAddMediaCallback) {
           if (audioStream) {
             this.onSelfAddMediaCallback({ mediakind: 'audio', mediastream: audioStream });
@@ -64,6 +71,7 @@ class Session extends Component {
         ...state.users,
         [user.uid]: user,
       },
+      // TODO: Logic for chatUsers into store
     }));
   }
 
@@ -72,6 +80,12 @@ class Session extends Component {
     this.setState(state => ({
       users: pickBy(state.users, (user, key) => key !== uid),
     }));
+  }
+
+  onRoomChatMessage(message) {
+    const { onReceiveMessage } = this.props;
+    const { sessionId } = this.state;
+    onReceiveMessage(sessionId, message);
   }
 
   onSelfAddMedia(callback) {
@@ -83,24 +97,22 @@ class Session extends Component {
   }
 
   sendMessage(text) {
-    const { onReceiveMessage, selfUid } = this.props;
-    const { sessionId } = this.state;
+    const { selfUid } = this.props;
 
-    // Remove whitespace
-    const trimmed = text.trim();
+    const message = {
+      sender: selfUid,
+      text: text.trim(), // Remove whitespace
+      timestamp: new Date().getTime(),
+    };
 
-    if (trimmed) {
-      this.room.sendMessage(trimmed);
-      onReceiveMessage(sessionId, {
-        sender: selfUid,
-        text: trimmed,
-        timestamp: new Date().getTime(),
-      });
+    if (message.text) {
+      this.room.sendMessage(message);
+      this.onRoomChatMessage(message);
     }
   }
 
   render() {
-    const { chat, chatUsers, selfUid } = this.props;
+    const { selfUid } = this.props;
     const { users, sessionId } = this.state;
 
     return (
@@ -125,10 +137,9 @@ class Session extends Component {
             uid={selfUid}
           />
           <Chat
-            messages={chat[sessionId]}
             selfUid={selfUid}
+            sessionId={sessionId}
             sendMessage={text => this.sendMessage(text)}
-            users={chatUsers[sessionId]}
           />
         </div>
       </div>
@@ -137,22 +148,10 @@ class Session extends Component {
 }
 
 Session.propTypes = {
-  chat: PropTypes.objectOf(
-    PropTypes.arrayOf(
-      PropTypes.exact({
-        sender: PropTypes.string.isRequired,
-        text: PropTypes.string.isRequired,
-        timestamp: PropTypes.number.isRequired,
-      }),
-    ),
-  ).isRequired,
-  chatUsers: PropTypes.objectOf(
-    PropTypes.arrayOf(PropTypes.string),
-  ).isRequired,
-  onReceiveMessage: PropTypes.func.isRequired,
   token: PropTypes.string.isRequired,
   selfUid: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
+  onReceiveMessage: PropTypes.func.isRequired,
 };
 
 export default Session;

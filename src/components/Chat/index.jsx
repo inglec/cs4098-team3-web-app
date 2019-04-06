@@ -26,27 +26,23 @@ class Chat extends Component {
 
   constructor(props) {
     super(props);
-
-    // Map of users to random colours
     this.colourMap = {};
   }
 
   render() {
     const {
       messages,
+      userUids,
       selfUid,
       sendMessage,
-      users,
     } = this.props;
 
-    // Generate unique colour for each user
-    this.colourMap = users.reduce((colourMap, uid) => {
-      if (!(uid in colourMap)) {
-        // eslint-disable-next-line no-param-reassign
-        colourMap[uid] = randomColor();
-      }
-      return colourMap;
-    }, this.colourMap);
+    // Create a new colour if there is a new chatUser
+    userUids
+      .filter(uid => !(uid in this.colourMap))
+      .forEach((uid) => {
+        this.colourMap[uid] = randomColor();
+      });
 
     return (
       <div className="chat">
@@ -81,9 +77,7 @@ class Chat extends Component {
             </div>
           </Scrollbar>
         </div>
-        <TextBox placeholder="Send a message" onSubmit={sendMessage}>
-          <SendIcon />
-        </TextBox>
+        <TextBox buttonLabel=<SendIcon /> placeholder="Send a message" onSubmit={sendMessage} />
       </div>
     );
   }
@@ -92,20 +86,15 @@ class Chat extends Component {
 Chat.propTypes = {
   selfUid: PropTypes.string.isRequired,
   sendMessage: PropTypes.func.isRequired,
-
+  sessionId: PropTypes.string,
   messages: PropTypes.arrayOf(
     PropTypes.exact({
       text: PropTypes.string.isRequired,
       timestamp: PropTypes.number.isRequired,
       sender: PropTypes.string.isRequired,
     }),
-  ),
-  users: PropTypes.arrayOf(PropTypes.string),
-};
-
-Chat.defaultProps = {
-  messages: [],
-  users: [],
+  ).isRequired,
+  userUids: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default Chat;

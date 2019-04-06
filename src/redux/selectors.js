@@ -23,6 +23,10 @@ export const getChatUsers = createSelector(getChat, chat => (
   })
 ));
 
+export const getSessionMessages = (state, sessionId) => state.chat[sessionId] || [];
+
+export const getSessionUsers = (state, sessionId) => getChatUsers(state)[sessionId] || [];
+
 export const getActiveSessions = createSelector(getSessions, sessions => (
   pickBy(sessions, ({ endTime, startTime }) => startTime < new Date().getTime() && !endTime)
 ));

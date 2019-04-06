@@ -6,10 +6,12 @@ import {
   NEW_PEER,
   MEDIASOUP_NOTIFICATION,
   MEDIASOUP_REQUEST,
+  METHOD_CHAT_MESSAGE,
   NOTIFY,
   REQUEST,
   ROOM_CLOSE,
   ROOM_USER_CONNECT,
+  ROOM_CHAT_MESSAGE,
   USER_DISCONNECT,
 } from './events';
 import Peer from './Peer';
@@ -18,14 +20,17 @@ class Room {
   constructor() {
     this.msRoom = new MediasoupRoom();
     this.peers = new Map();
+    this.sessionId = null;
     this.socket = null;
     this.isMuted = false;
     this.transports = { recv: null, send: null };
+    this.mediastream = null;
 
     // Events that can be listened for
     this.listeners = {
       [ROOM_CLOSE]: [],
       [ROOM_USER_CONNECT]: [],
+      [ROOM_CHAT_MESSAGE]: [],
     };
 
     // Connect event listeners
@@ -40,9 +45,7 @@ class Room {
   join(url, uid, token) {
     // Connect our local and remote room through a socket
     this.socket = io(url, { query: { uid, token } });
-    this.socket.on(MEDIASOUP_NOTIFICATION, notification => (
-      this.msRoom.receiveNotification(notification)
-    ));
+    this.socket.on(MEDIASOUP_NOTIFICATION, notification => this.notificationHandler(notification));
 
     // Join the room
     return this.msRoom.join(uid)
@@ -51,7 +54,6 @@ class Room {
           recv: this.msRoom.createTransport('recv'),
           send: this.msRoom.createTransport('send'),
         };
-
         // Setup all the handles for every other peer already in the room
         peers.forEach(peer => this.onRoomNewPeer(peer));
       })
@@ -60,6 +62,8 @@ class Room {
         navigator.mediaDevices.getUserMedia({ audio: true, video: true })
       ))
       .then((mediastream) => {
+        this.mediastream = mediastream;
+
         // Create references to mediastreams which may be assigned to if tracks exist
         let audioStream = null;
         let videoStream = null;
@@ -84,12 +88,26 @@ class Room {
           videoStream.addTrack(video);
         }
 
-        return Promise.resolve({ audioStream, videoStream });
+        return Promise.resolve({ sessionId: this.sessionId, audioStream, videoStream });
       });
+  }
+
+  notificationHandler(notification) {
+    if (notification.method === METHOD_CHAT_MESSAGE) {
+      this.handleIncomingChatMessage(notification.appData);
+    }
+    this.msRoom.receiveNotification(notification);
+  }
+
+  handleIncomingChatMessage(message) {
+    this.emit(ROOM_CHAT_MESSAGE, message);
   }
 
   leave() {
     this.msRoom.leave();
+    if (this.mediastream) {
+      this.mediastream.getTracks().forEach(track => track.stop());
+    }
   }
 
   on(eventName, callback) {
@@ -105,14 +123,19 @@ class Room {
     }
   }
 
-  // eslint-disable-next-line
   sendMessage(message) {
-    // TODO
+    // { selfUid, text, timestamp }
+    const messageNotification = {
+      method: METHOD_CHAT_MESSAGE,
+      target: 'room',
+      notification: true,
+      appData: message,
+    };
+    this.socket.emit(MEDIASOUP_NOTIFICATION, messageNotification);
   }
 
   toggleMute() {
     this.isMuted = !this.isMuted;
-
     return this.isMuted;
   }
 
@@ -137,6 +160,9 @@ class Room {
       if (err) {
         errback(err);
       } else {
+        if (response && response.sessionId) {
+          this.sessionId = response.sessionId;
+        }
         callback(response);
       }
     });
