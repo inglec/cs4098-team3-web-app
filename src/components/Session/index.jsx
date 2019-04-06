@@ -39,12 +39,14 @@ class Session extends Component {
     this.room
       .join(url, selfUid, token)
       .then(({ sessionId, audioStream, videoStream }) => {
-        this.setState(state => ({ ...state, sessionId }));
-        if (audioStream) {
-          this.onSelfAddMediaCallback({ mediakind: 'audio', mediastream: audioStream });
-        }
-        if (videoStream) {
-          this.onSelfAddMediaCallback({ mediakind: 'video', mediastream: videoStream });
+        this.setState({ sessionId });
+        if (this.onSelfAddMediaCallback) {
+          if (audioStream) {
+            this.onSelfAddMediaCallback({ mediakind: 'audio', mediastream: audioStream });
+          }
+          if (videoStream) {
+            this.onSelfAddMediaCallback({ mediakind: 'video', mediastream: videoStream });
+          }
         }
       });
   }
