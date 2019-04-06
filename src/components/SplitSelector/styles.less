@@ -1,0 +1,47 @@
+.splitselector {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 10px 0;
+
+  .splitselector-container {
+    display: flex;
+    flex: auto;
+    overflow: hidden;
+
+    .splitselector-pane {
+      flex: 1 1 0;
+      padding: 0 10px;
+
+      .splitselector-pane-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        .splitselector-pane-card {
+          flex: auto;
+
+          &.splitselector-left {
+            background-color: whitesmoke;
+          }
+
+          .card-body {
+            height: 100%;
+          }
+        }
+      }
+    }
+
+    .splitselector-pane + .splitselector-pane {
+      border-left: 1px solid lightgrey;
+    }
+  }
+
+  .splitselector-unselected {
+    align-items: center;
+    color: grey;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+  }
+}

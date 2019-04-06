@@ -1,0 +1,53 @@
+.groups {
+  .page-container {
+    display: flex;
+    flex-direction: column;
+
+    .splitselector {
+      flex: auto;
+
+      .active {
+        .subtitle {
+          color: gainsboro;
+        }
+      }
+
+      .user-preview {
+        display: flex;
+        flex: auto;
+        align-items: center;
+
+        img {
+          border-radius: 10px;
+          height: 40px;
+          object-fit: cover;
+          margin-right: 10px;
+          width: 40px;
+        }
+      }
+
+      .remove-patient {
+        color: red;
+        cursor: pointer;
+      }
+
+      .add-patient {
+        color: forestgreen;
+        cursor: pointer;
+        margin-left: 5px;
+      }
+
+      .spacebetween {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+  }
+
+  button {
+    background-color: unset;
+    border: 0;
+    outline: unset;
+    padding: 0;
+  }
+}
