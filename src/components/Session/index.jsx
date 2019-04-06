@@ -2,13 +2,14 @@ import { pickBy } from 'lodash/object';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 
-import Chat from 'app-containers/Chat'
+import Chat from 'app-containers/Chat';
 import Room from 'app-utils/video/Room';
 import {
   ROOM_CLOSE,
   ROOM_USER_CONNECT,
   ROOM_CHAT_MESSAGE,
- } from 'app-utils/video/events';
+  USER_DISCONNECT,
+} from 'app-utils/video/events';
 
 import Options from './Options';
 import Video from './Video';
@@ -66,12 +67,12 @@ class Session extends Component {
 
   onUserConnect(user) {
     // Add user to state
+    user.on(USER_DISCONNECT, uid => this.onUserDisconnect(uid));
     this.setState(state => ({
       users: {
         ...state.users,
         [user.uid]: user,
       },
-      // TODO: Logic for chatUsers into store
     }));
   }
 
