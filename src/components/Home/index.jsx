@@ -12,7 +12,7 @@ const createSessionLists = (sessions, push) => {
   const futureSessions = sessions.filter(session => !session.active && !session.complete);
 
   return (
-    <div className="page-container">
+    <div>
       <SessionList sessions={activeSessions} title="Active Sessions" push={push} path="/session" />
       <SessionList sessions={reviewSessions} title="Past Sessions" push={push} path="/review" />
       <SessionList sessions={futureSessions} title="Future Sessions" push={push} path="" />
