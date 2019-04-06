@@ -1,3 +1,4 @@
+import { get } from 'lodash/object';
 import PropTypes from 'prop-types';
 import React from 'react';
 import Nav from 'react-bootstrap/Nav';
@@ -69,7 +70,7 @@ const AppNavbar = (props) => {
             )
           }
           {
-            user.userType === 'admin'
+            get(user, 'userType') === 'admin'
               ? renderNavLink(
                 '/groups',
                 <IconedText icon={GroupsIcon}>Group Management</IconedText>,

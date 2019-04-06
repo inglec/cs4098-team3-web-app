@@ -14,6 +14,7 @@ const chat = {
 
 const groups = {
   testgroup: {
+    groupName: 'Test Group',
     admin: 'testadmin',
     users: ['asmirnov', 'conevin', 'cosgroco', 'ebergman', 'inglec', 'meaneych'],
     mentors: [],

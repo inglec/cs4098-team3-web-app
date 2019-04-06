@@ -1,164 +1,136 @@
-import { map } from 'lodash/collection';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React from 'react';
 import Badge from 'react-bootstrap/Badge';
 import Button from 'react-bootstrap/Button';
-import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import ListGroup from 'react-bootstrap/ListGroup';
 import CheckIcon from 'react-feather/dist/icons/check-circle';
-import Scrollbar from 'react-perfect-scrollbar';
+
+import SplitSelector from 'app-components/SplitSelector';
+import TitleSubtitle from 'app-components/TitleSubtitle';
+import UserPreview from 'app-components/UserPreview';
 
 import './styles';
 
-class Archives extends Component {
-  constructor(props) {
-    super(props);
+const formatDate = time => moment(time).format('ddd, Do MMM YYYY, HH:mm:ss');
 
-    this.state = {
-      selectedSessionId: '',
-    };
-  }
+const renderSessionId = (sessionId, sessions, userType) => {
+  const { review, startTime } = sessions[sessionId];
 
-  setSelectedSession(sessionId) {
-    // Deselect session ID if already selected
-    this.setState(({ selectedSessionId }) => ({
-      selectedSessionId: selectedSessionId === sessionId ? '' : sessionId,
-    }));
-  }
+  const status = userType === 'admin' && review
+    ? <Badge variant="success" className="reviewed">reviewed</Badge>
+    : null;
 
-  renderSessionList() {
-    const { sessions, user } = this.props;
-    const { selectedSessionId } = this.state;
+  const startTimeString = formatDate(startTime);
 
-    return (
-      <ListGroup>
-        {
-          map(sessions, (session, sessionId) => {
-            const status = user.userType === 'admin' && sessions[sessionId].review
-              ? <Badge variant="success" className="status">reviewed</Badge>
-              : null;
+  return (
+    <span>
+      <TitleSubtitle>
+        {sessionId}
+        {startTimeString}
+      </TitleSubtitle>
+      {status}
+    </span>
+  );
+};
 
-            return (
-              <ListGroup.Item
-                key={sessionId}
-                active={selectedSessionId === sessionId}
-                onClick={() => this.setSelectedSession(sessionId)}
-              >
-                {sessionId}
-                {status}
-              </ListGroup.Item>
-            );
-          })
-        }
-      </ListGroup>
-    );
-  }
+const renderSelectedSession = (selectedSession, groups, user, users, history) => {
+  const {
+    attendance = {},
+    endTime,
+    groupId,
+    review = {},
+    startTime,
+  } = selectedSession;
 
-  renderSelectedSession() {
-    const {
-      groups,
-      history,
-      sessions,
-      user,
-    } = this.props;
-    const { selectedSessionId } = this.state;
-    const selectedSession = sessions[selectedSessionId];
+  const startTimeString = formatDate(startTime);
+  const endTimeString = formatDate(endTime);
 
-    if (!selectedSession) {
-      return <div className="unselected">Select a session from the left-hand pane to begin</div>;
-    }
+  const duration = moment.duration(endTime - startTime);
+  const hours = duration.hours();
+  const minutes = duration.minutes();
+  const durationString = `${hours ? `${hours}hr ` : ''}${minutes}m`;
 
-    const {
-      attendance = {},
-      endTime,
-      groupId,
-      review = {},
-      startTime,
-    } = selectedSession;
+  const { users: groupUsers } = groups[groupId];
+  const confirmed = review.confirmed || [];
+  const isAdmin = user.userType === 'admin';
 
-    const formatDate = time => moment(time).format('ddd, Do MMM YYYY, HH:mm:ss');
-    const startTimeString = formatDate(startTime);
-    const endTimeString = formatDate(endTime);
+  return (
+    <Form>
+      <Form.Group>
+        <Form.Label>Start time</Form.Label>
+        <Form.Control type="text" value={startTimeString} disabled />
+      </Form.Group>
+      <Form.Group>
+        <Form.Label>End time</Form.Label>
+        <Form.Control type="text" value={endTimeString} disabled />
+      </Form.Group>
+      <Form.Group>
+        <Form.Label>Duration</Form.Label>
+        <Form.Control type="text" value={durationString} disabled />
+      </Form.Group>
+      <Form.Group>
+        <Form.Label>{isAdmin ? 'Review' : 'Attendance' }</Form.Label>
+        <ListGroup>
+          {
+            groupUsers.map((uid) => {
+              const { avatarUrl, name } = users[uid];
 
-    const duration = moment.duration(endTime - startTime);
-    const hours = duration.hours();
-    const minutes = duration.minutes();
-    const durationString = `${hours ? `${hours}hr ` : ''}${minutes}m`;
-
-    const { users } = groups[groupId];
-    const confirmed = review.confirmed || [];
-    const isAdmin = user.userType === 'admin';
-
-    return (
-      <Form>
-        <Form.Group>
-          <Form.Label>Start time</Form.Label>
-          <Form.Control type="text" value={startTimeString} disabled />
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>End time</Form.Label>
-          <Form.Control type="text" value={endTimeString} disabled />
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Duration</Form.Label>
-          <Form.Control type="text" value={durationString} disabled />
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>{isAdmin ? 'Review' : 'Attendance' }</Form.Label>
-          <ListGroup>
-            {
-              users.map(uid => (
+              return (
                 <ListGroup.Item key={uid} disabled={!Object.keys(attendance).includes(uid)}>
-                  {uid}
-                  {isAdmin && confirmed.includes(uid) ? <CheckIcon className="icon" /> : null}
+                  <UserPreview avatarUrl={avatarUrl} name={name} uid={uid} />
+                  {isAdmin && confirmed.includes(uid) ? <CheckIcon className="confirmed" /> : null}
                 </ListGroup.Item>
-              ))
-            }
-          </ListGroup>
-        </Form.Group>
-        <Button
-          block
-          size="md"
-          variant="outline-primary"
-          onClick={() => history.push('/review')}
-        >
-          View Session Archive
-        </Button>
-      </Form>
-    );
-  }
+              );
+            })
+          }
+        </ListGroup>
+      </Form.Group>
+      {
+        isAdmin
+          ? (
+            <Button
+              block
+              size="md"
+              variant="outline-primary"
+              onClick={() => history.push('/review')}
+            >
+              View Session Archive
+            </Button>
+          )
+          : null
+      }
+    </Form>
+  );
+};
 
-  render() {
-    return (
-      <div className="page archives">
-        <div className="page-container">
-          <div className="archives-container">
-            <div className="archives-col">
-              <h5>Archived Sessions</h5>
-              <Card>
-                <Scrollbar>
-                  {this.renderSessionList()}
-                </Scrollbar>
-              </Card>
-            </div>
-            <div className="archives-col">
-              <h5>Session Information</h5>
-              <Card>
-                <Scrollbar>
-                  <Card.Body>
-                    {this.renderSelectedSession()}
-                  </Card.Body>
-                </Scrollbar>
-              </Card>
-            </div>
-          </div>
-        </div>
+const Archives = (props) => {
+  const {
+    groups,
+    history,
+    sessions,
+    user,
+    users,
+  } = props;
+
+  return (
+    <div className="page archives">
+      <div className="page-container">
+        <SplitSelector
+          keys={Object.keys(sessions)}
+          leftTitle="Archived Sessions"
+          renderContent={
+            selected => renderSelectedSession(sessions[selected], groups, user, users, history)
+          }
+          renderKey={key => renderSessionId(key, sessions, user.userType)}
+          rightTitle="Session Information"
+          unselectedMessage="Select a session from the left-hand pane to begin"
+        />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 // TODO: Make required
 Archives.propTypes = {
@@ -170,9 +142,8 @@ Archives.propTypes = {
 
   // FIXME
   sessions: PropTypes.object.isRequired,
-
-  // FIXME:
   user: PropTypes.object.isRequired,
+  users: PropTypes.object.isRequired,
 };
 
 export default Archives;
