@@ -12,6 +12,15 @@ const chat = {
   testsession: [],
 };
 
+const groups = {
+  testgroup: {
+    groupName: 'Test Group',
+    admin: 'testadmin',
+    users: ['asmirnov', 'conevin', 'cosgroco', 'ebergman', 'inglec', 'meaneych'],
+    mentors: [],
+  },
+};
+
 const SECOND = 1000;
 const MINUTE = SECOND * 60;
 const HOUR = MINUTE * 60;
@@ -32,11 +41,46 @@ const sessions = {
     groupId: 'testgroup',
     startTime: time - DAY,
     endTime: time - HOUR * 23,
+    attendance: {
+      ebergman: {
+        joinedAt: time - DAY + MINUTE * 2,
+        leftAt: time - DAY + MINUTE * 20,
+      },
+      inglec: {
+        joinedAt: time - DAY + MINUTE,
+        leftAt: time - DAY + MINUTE * 23,
+        tickedAt: time - DAY + MINUTE * 4,
+      },
+    },
+    review: {
+      reviewedBy: 'testadmin',
+      confirmed: ['ebergman', 'inglec'],
+    },
   },
   pastsession2: {
     groupId: 'testgroup',
     startTime: time - DAY * 2,
     endTime: time - DAY * 2 + HOUR,
+    attendance: {
+      asmirnov: {
+        joinedAt: time - DAY * 2 + MINUTE * 10,
+        leftAt: time - DAY * 2 + MINUTE * 27,
+      },
+      conevin: {
+        joinedAt: time - DAY * 2 + MINUTE * 5,
+        leftAt: time - DAY * 2 + MINUTE * 22,
+        tickedAt: time - DAY * 2 + MINUTE * 10,
+      },
+      ebergman: {
+        joinedAt: time - DAY * 2 + MINUTE * 7,
+        leftAt: time - DAY * 2 + MINUTE * 37,
+        tickedAt: time - DAY * 2 + MINUTE * 13,
+      },
+    },
+    review: {
+      reviewedBy: 'testadmin',
+      confirmed: ['asmirnov', 'conevin'],
+    },
   },
   activeSession: {
     groupId: 'testgroup',
@@ -94,12 +138,15 @@ const users = {
     phone: '',
     userType: 'patient',
   },
+  testadmin: {
+    userType: 'admin',
+  },
 };
-
 
 export default {
   auth,
   chat,
+  groups,
   sessions,
   users,
 };

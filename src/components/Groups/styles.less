@@ -1,0 +1,39 @@
+.groups {
+  .page-container {
+    display: flex;
+    flex-direction: column;
+
+    .splitselector {
+      flex: auto;
+
+      .active {
+        .subtitle {
+          color: gainsboro;
+        }
+      }
+
+      .remove-patient {
+        color: red;
+        cursor: pointer;
+      }
+
+      .add-patient {
+        color: forestgreen;
+        cursor: pointer;
+        margin-left: 5px;
+      }
+
+      .spacebetween {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+  }
+
+  button {
+    background-color: unset;
+    border: 0;
+    outline: unset;
+    padding: 0;
+  }
+}

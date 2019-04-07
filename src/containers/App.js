@@ -1,6 +1,8 @@
 import { connect } from 'react-redux';
+import 'react-perfect-scrollbar/dist/css/styles.css';
 
 import App from 'app-components/App';
+
 
 import { getAuth } from 'app-redux/selectors';
 

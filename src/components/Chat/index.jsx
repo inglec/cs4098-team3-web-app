@@ -6,7 +6,6 @@ import Badge from 'react-bootstrap/Badge';
 import Card from 'react-bootstrap/Card';
 import Scrollbar from 'react-perfect-scrollbar';
 import SendIcon from 'react-feather/dist/icons/send';
-import 'react-perfect-scrollbar/dist/css/styles.css';
 
 import TextBox from 'app-components/TextBox';
 
