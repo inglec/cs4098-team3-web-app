@@ -1,21 +1,33 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import moment from 'moment';
 
 import SessionList from './SessionList';
-
 import './styles';
 
 const createSessionLists = (sessions, push) => {
-  const activeSessions = []; //sessions.filter(session => session.active);
-  const reviewSessions = []; //sessions.filter(session => !session.active && session.complete);
-  const futureSessions = []; //sessions.filter(session => !session.active && !session.complete);
+  const activeSessions = [];
+  const futureSessions = [];
+
+  const keys = Object.keys(sessions);
+  for (let i = 0; i < keys.length; i += 1) {
+    const session = sessions[keys[i]];
+    const startTime = moment(session.startTime, 'x');
+    const endTime = moment(session.endTime, 'x');
+    const complete = moment().isAfter(endTime);
+    const active = moment().isBetween(startTime, endTime);
+
+    if (complete) {
+      futureSessions.push(sessions[keys[i]]);
+    } else if (active) {
+      activeSessions.push(sessions[keys[i]]);
+    }
+  }
 
   return (
     <div className="page-container">
-      <Link to="/session">Temp link to session</Link>
       <SessionList sessions={activeSessions} title="Active Sessions" push={push} path="/session" />
-      <SessionList sessions={reviewSessions} title="Past Sessions" push={push} path="/review" />
       <SessionList sessions={futureSessions} title="Future Sessions" push={push} path="" />
     </div>
   );
