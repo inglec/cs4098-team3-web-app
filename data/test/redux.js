@@ -82,6 +82,11 @@ const sessions = {
       confirmed: ['asmirnov', 'conevin'],
     },
   },
+  activeSession: {
+    groupId: 'testgroup',
+    startTime: time - MINUTE * 20,
+    endTime: time - MINUTE * 20 + HOUR,
+  },
 };
 
 const users = {

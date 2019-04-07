@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import moment from 'moment';
 import { Card, Button } from 'react-bootstrap';
 import './styles';
 
@@ -8,7 +9,10 @@ const reviewImageSource = '../../../../data/test/review.png';
 const futureImageSource = '../../../../data/test/future.png';
 
 const SessionBox = ({ session, push, path }) => {
-  const { day, complete, active } = session;
+  const startTime = moment(session.startTime, 'x');
+  const endTime = moment(session.endTime, 'x');
+  const complete = moment().isAfter(endTime);
+  const active = moment().isBetween(startTime, endTime);
 
   const getSessionCardText = () => {
     let text = '';
@@ -57,7 +61,7 @@ const SessionBox = ({ session, push, path }) => {
       <Card className="cards">
         <Card.Img className="cardImage" variant="top" src={getSessionCardImage()} />
         <Card.Title>
-          <h2>{day}</h2>
+          <h3>{startTime.format('Do MMMM, h:mm a')}</h3>
         </Card.Title>
         <Card.Text>
           {getSessionCardText()}

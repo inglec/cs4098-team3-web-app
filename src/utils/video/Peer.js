@@ -57,7 +57,7 @@ class Peer {
   }
 
   onClose() {
-    this.emit(USER_DISCONNECT, { uid: this.uid });
+    this.emit(USER_DISCONNECT, this.uid);
   }
 
   onNewConsumer(consumer) {
