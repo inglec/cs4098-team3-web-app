@@ -20,10 +20,10 @@ class VideoLayout extends Component {
   constructor(props) {
     super(props);
 
-    const { users } = props;
+    const { peers } = props;
 
     this.layoutRef = null;
-    this.videoContainerRefs = mapValues(users, () => null);
+    this.videoContainerRefs = mapValues(peers, () => null);
 
     this.eventListeners = [];
 
@@ -71,7 +71,7 @@ class VideoLayout extends Component {
 
 
   calculateVideoDimensions() {
-    const { users } = this.props;
+    const { peers } = this.props;
 
     /**
     * For this calculation, we consider each video as having dimensions n:m (aspect ratio).
@@ -79,7 +79,7 @@ class VideoLayout extends Component {
     *
     * Example: A 4:3 aspect ratio is represented as 1.3333 units.
     */
-    const uids = Object.keys(users);
+    const uids = Object.keys(peers);
 
     // Calculate width:height ratio for each video
     const aspectRatios = mapValues(this.videoContainerRefs, (videoContainerRef) => {
@@ -167,22 +167,22 @@ class VideoLayout extends Component {
   }
 
   render() {
-    const { users } = this.props;
+    const { users, peers } = this.props;
 
     return (
       <div className="videolayout" ref={ref => this.setLayoutRef(ref)}>
         {
-          map(users, (user, uid) => (
+          map(peers, (peer, uid) => (
             <Video
-              displayName={null /* TODO */}
+              displayName={users[uid].name}
               key={uid}
               isMuted={false /* TODO */}
               isTicked={false /* TODO */}
               onLoadMetadata={() => this.updateVideos()}
               onMute={() => console.log('mute', uid) /* TODO */}
               onTick={() => console.log('tick', uid) /* TODO */}
-              onUserAddMedia={callback => user.on(USER_ADD_MEDIA, callback)}
-              onUserRemoveMedia={callback => user.on(USER_REMOVE_MEDIA, callback)}
+              onUserAddMedia={callback => peer.on(USER_ADD_MEDIA, callback)}
+              onUserRemoveMedia={callback => peer.on(USER_REMOVE_MEDIA, callback)}
               setVideoContainerRef={ref => this.setVideoContainerRef(uid, ref)}
               uid={uid}
             />
@@ -194,7 +194,8 @@ class VideoLayout extends Component {
 }
 
 VideoLayout.propTypes = {
-  users: PropTypes.objectOf(
+  users: PropTypes.object.isRequired,
+  peers: PropTypes.objectOf(
     // FIXME
     PropTypes.any,
   ).isRequired,

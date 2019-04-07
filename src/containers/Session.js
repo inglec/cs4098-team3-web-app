@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { videoServerUrl } from 'app-config';
 import Session from 'app-components/Session';
 import { addChatMessage } from 'app-redux/actions';
-import { getAuth } from 'app-redux/selectors';
+import { getAuth, getUsers } from 'app-redux/selectors';
 
 
 const mapStateToProps = (state) => {
@@ -12,6 +12,7 @@ const mapStateToProps = (state) => {
     token,
     selfUid: uid,
     url: videoServerUrl,
+    users: getUsers(state),
   });
 };
 

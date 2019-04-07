@@ -13,7 +13,7 @@ import UserPreview from 'app-components/UserPreview';
 
 import './styles';
 
-const formatDate = time => moment(time).format('ddd, Do MMM YYYY, HH:mm:ss');
+const formatDate = time => moment(time).format('DD/MM/YYYY, HH:mm:ss');
 
 const renderSessionId = (sessionId, sessions, userType) => {
   const { review, startTime } = sessions[sessionId];

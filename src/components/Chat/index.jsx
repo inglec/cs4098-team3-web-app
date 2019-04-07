@@ -77,7 +77,9 @@ class Chat extends Component {
             </div>
           </Scrollbar>
         </div>
-        <TextBox buttonLabel=<SendIcon /> placeholder="Send a message" onSubmit={sendMessage} />
+        <TextBox onSubmit={sendMessage}>
+          <SendIcon />
+        </TextBox>
       </div>
     );
   }

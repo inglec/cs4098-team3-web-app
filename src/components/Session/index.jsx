@@ -22,8 +22,8 @@ class Session extends Component {
     super(props);
 
     this.state = {
+      peers: {},
       sessionId: null,
-      users: {},
     };
 
     this.onSelfAddMediaCallback = null;
@@ -34,7 +34,7 @@ class Session extends Component {
     this.room = new Room();
     this.room
       .on(ROOM_CLOSE, () => this.onRoomClose())
-      .on(ROOM_USER_CONNECT, user => this.onUserConnect(user))
+      .on(ROOM_USER_CONNECT, peer => this.onPeerConnect(peer))
       .on(ROOM_CHAT_MESSAGE, message => this.onRoomChatMessage(message));
 
     this.room
@@ -53,33 +53,28 @@ class Session extends Component {
   }
 
   componentWillUnmount() {
-    if (this.onSelfRemoveMediaCallback) {
-      this.onSelfRemoveMediaCallback({ mediakind: 'audio' });
-      this.onSelfRemoveMediaCallback({ mediakind: 'video' });
-    }
-
-    this.room.leave();
+    this.leaveRoom();
   }
 
   onRoomClose() {
-    this.setState({ users: {} });
+    this.setState({ peers: {} });
   }
 
-  onUserConnect(user) {
-    // Add user to state
-    user.on(USER_DISCONNECT, uid => this.onUserDisconnect(uid));
+  onPeerConnect(peer) {
+    // Add peer to state
+    peer.on(USER_DISCONNECT, uid => this.onPeerDisconnect(uid));
     this.setState(state => ({
-      users: {
-        ...state.users,
-        [user.uid]: user,
+      peers: {
+        ...state.peers,
+        [peer.uid]: peer,
       },
     }));
   }
 
-  onUserDisconnect(uid) {
-    // Remove user from state
+  onPeerDisconnect(uid) {
+    // Remove peer from state
     this.setState(state => ({
-      users: pickBy(state.users, (user, key) => key !== uid),
+      peers: pickBy(state.peers, (peer, key) => key !== uid),
     }));
   }
 
@@ -95,6 +90,22 @@ class Session extends Component {
 
   onSelfRemoveMedia(callback) {
     this.onSelfRemoveMediaCallback = callback;
+  }
+
+  onHangUp() {
+    const { history } = this.props;
+
+    this.leaveRoom();
+    history.push('/');
+  }
+
+  leaveRoom() {
+    if (this.onSelfRemoveMediaCallback) {
+      this.onSelfRemoveMediaCallback({ mediakind: 'audio' });
+      this.onSelfRemoveMediaCallback({ mediakind: 'video' });
+    }
+
+    this.room.leave();
   }
 
   sendMessage(text) {
@@ -113,19 +124,16 @@ class Session extends Component {
   }
 
   render() {
-    const { selfUid } = this.props;
-    const { users, sessionId } = this.state;
+    const { selfUid, users } = this.props;
+    const { peers, sessionId } = this.state;
 
     return (
       <div className="page session">
         <div className="session-main">
           <div className="videolayout-container">
-            <VideoLayout users={users} />
+            <VideoLayout peers={peers} users={users} />
           </div>
-          <Options
-            isMuted={this.room.isMuted}
-            toggleMute={() => this.room.toggleMute()}
-          />
+          <Options onHangUp={() => this.onHangUp()} />
         </div>
         <div className="sidebar">
           <Video
@@ -149,9 +157,13 @@ class Session extends Component {
 }
 
 Session.propTypes = {
+  history: PropTypes.shape({
+    push: PropTypes.func.isRequired,
+  }).isRequired,
   token: PropTypes.string.isRequired,
   selfUid: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
+  users: PropTypes.object.isRequired,
   onReceiveMessage: PropTypes.func.isRequired,
 };
 
