@@ -29,9 +29,17 @@ const DAY = HOUR * 24;
 const time = new Date().getTime();
 
 const sessions = {
-  futuresession: {
+  futuresession1: {
     groupId: 'testgroup',
     startTime: time + HOUR * 3,
+  },
+  futuresession2: {
+    groupId: 'testgroup',
+    startTime: time + HOUR * 5,
+  },
+  futuresession3: {
+    groupId: 'testgroup',
+    startTime: time + HOUR * 12,
   },
   testsession: {
     groupId: 'testgroup',
@@ -81,11 +89,6 @@ const sessions = {
       reviewedBy: 'testadmin',
       confirmed: ['asmirnov', 'conevin'],
     },
-  },
-  activeSession: {
-    groupId: 'testgroup',
-    startTime: time - MINUTE * 20,
-    endTime: time - MINUTE * 20 + HOUR,
   },
 };
 
