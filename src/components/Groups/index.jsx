@@ -67,10 +67,7 @@ const Groups = (props) => {
   );
 
   const renderKey = groupId => (
-    <TitleSubtitle>
-      {groups[groupId].groupName}
-      {groupId}
-    </TitleSubtitle>
+    <TitleSubtitle subtitle={groupId} title={groups[groupId].groupName} />
   );
 
   return (

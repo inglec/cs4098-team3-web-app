@@ -26,10 +26,7 @@ const renderSessionId = (sessionId, sessions, userType) => {
 
   return (
     <span>
-      <TitleSubtitle>
-        {sessionId}
-        {startTimeString}
-      </TitleSubtitle>
+      <TitleSubtitle subtitle={startTimeString} title={sessionId} />
       {status}
     </span>
   );

@@ -3,20 +3,16 @@ import React from 'react';
 
 import './styles';
 
-const TitleSubtitle = ({ children }) => {
-  const title = children[0];
-  const subtitle = children[1];
-
-  return (
-    <div className="title-subtitle">
-      <span>{title}</span>
-      <span className="subtitle">{subtitle}</span>
-    </div>
-  );
-};
+const TitleSubtitle = ({ subtitle, title }) => (
+  <div className="title-subtitle">
+    <span>{title}</span>
+    <span className="subtitle">{subtitle}</span>
+  </div>
+);
 
 TitleSubtitle.propTypes = {
-  children: PropTypes.arrayOf(PropTypes.node).isRequired,
+  title: PropTypes.node.isRequired,
+  subtitle: PropTypes.node.isRequired,
 };
 
 export default TitleSubtitle;

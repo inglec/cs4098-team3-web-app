@@ -8,10 +8,7 @@ import './styles';
 const UserPreview = ({ avatarUrl, name, uid }) => (
   <div className="userpreview">
     <img src={avatarUrl} alt={uid} />
-    <TitleSubtitle>
-      {name}
-      {uid}
-    </TitleSubtitle>
+    <TitleSubtitle subtitle={uid} title={name} />
   </div>
 );
 
