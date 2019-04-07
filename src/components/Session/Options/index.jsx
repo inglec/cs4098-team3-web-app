@@ -1,18 +1,20 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import HangUpIcon from 'react-feather/dist/icons/phone-off';
+
 import './styles';
 
-const Options = ({ isMuted, toggleMute }) => (
+const Options = ({ onHangUp }) => (
   <div className="video-options">
-    <span>Options</span>
-    <button type="button" onClick={toggleMute}>{isMuted ? 'Unmute' : 'Mute'}</button>
+    <button type="button" className="hangup" onClick={onHangUp}>
+      <HangUpIcon />
+    </button>
   </div>
 );
 
 Options.propTypes = {
-  isMuted: PropTypes.bool.isRequired,
-  toggleMute: PropTypes.func.isRequired,
+  onHangUp: PropTypes.func.isRequired,
 };
 
 export default Options;
