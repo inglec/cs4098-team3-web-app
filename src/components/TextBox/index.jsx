@@ -8,7 +8,25 @@ class TextBox extends Component {
   constructor(props) {
     super(props);
 
+    this.inputRef = null;
     this.state = { text: '' };
+  }
+
+  componentDidMount() {
+    document.addEventListener('keydown', event => this.onKeyPressed(event));
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', event => this.onKeyPressed(event));
+  }
+
+  onKeyPressed({ key }) {
+    // Check if text box is selected
+    const isInputActive = document.activeElement === this.inputRef;
+
+    if (isInputActive && key === 'Enter') {
+      this.onClickSubmit();
+    }
   }
 
   onTextChange(event) {
@@ -23,6 +41,20 @@ class TextBox extends Component {
     this.setState({ text: '' });
   }
 
+  setInputRef(ref) {
+    // Remove old event listener
+    if (this.inputRef) {
+      this.inputRef.removeEventListener('keydown', event => this.onKeyPressed(event));
+    }
+
+    // Add new event listener
+    if (ref) {
+      ref.addEventListener('keydown', event => this.onKeyPressed(event));
+    }
+
+    this.inputRef = ref;
+  }
+
   render() {
     const { text } = this.state;
     const { children, placeholder } = this.props;
@@ -33,6 +65,7 @@ class TextBox extends Component {
           as="input"
           placeholder={placeholder}
           onChange={event => this.onTextChange(event)}
+          ref={ref => this.setInputRef(ref)}
           value={text}
         />
         <InputGroup.Append>
