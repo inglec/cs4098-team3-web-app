@@ -2,16 +2,12 @@ import { connect } from 'react-redux';
 
 import Home from 'app-components/Home';
 
-import { getAuth, getSessions } from 'app-redux/selectors';
+import { getAuth, getActiveSessions, getFutureSessions } from 'app-redux/selectors';
 
-const mapStateToProps = (state) => {
-  const { uid, token } = getAuth(state);
-  const sessions = getSessions(state);
-  return ({
-    isAuthenticated: !!token,
-    selfUid: uid,
-    sessions,
-  });
-};
+const mapStateToProps = state => ({
+  activeSessions: getActiveSessions(state),
+  futureSessions: getFutureSessions(state),
+  isAuthenticated: !!getAuth(state).token,
+});
 
 export default connect(mapStateToProps)(Home);

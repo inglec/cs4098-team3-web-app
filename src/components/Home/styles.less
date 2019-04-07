@@ -1,5 +1,30 @@
-.links {
-  a {
-    display: block;
+.home {
+  .sessions {
+    display: flex;
+
+    .card {
+      height: 250px;
+      width: 250px;
+
+      .card-body {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+
+        img {
+          height: 80px;
+          width: 80px;
+          margin-bottom: 10px;
+        }
+      }
+    }
+
+    .card + .card {
+      margin-left: 5px;
+    }
+  }
+
+  .sessionlist + .sessionlist {
+    margin-top: 20px;
   }
 }
