@@ -14,7 +14,7 @@ const renderSessionBox = (sessionId, startTime, endTime, isActive, onClick) => {
   const imageSrc = `../../data/test/${isActive ? 'live.png' : 'future.png'}`;
 
   return (
-    <Card>
+    <Card key={sessionId}>
       <Card.Body>
         <img src={imageSrc} alt={sessionId} />
         <Card.Title>{startTimeString}</Card.Title>
