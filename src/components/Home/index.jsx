@@ -1,24 +1,26 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import moment from 'moment';
 
 import SessionList from './SessionList';
 import './styles';
-
-const SECOND = 1000;
-const MINUTE = SECOND * 60;
-const HOUR = MINUTE * 60;
 
 const createSessionLists = (sessions, push) => {
   const activeSessions = [];
   const futureSessions = [];
 
-  const time = new Date().getTime();
   const keys = Object.keys(sessions);
   for (let i = 0; i < keys.length; i += 1) {
-    if (sessions[keys[i]].startTime > time) {
+    const session = sessions[keys[i]];
+    const startTime = moment(session.startTime, 'x');
+    const endTime = moment(session.endTime, 'x');
+    const complete = moment().isAfter(endTime);
+    const active = moment().isBetween(startTime, endTime);
+
+    if (complete) {
       futureSessions.push(sessions[keys[i]]);
-    } else if (time - sessions[keys[i]].startTime < HOUR) {
+    } else if (active) {
       activeSessions.push(sessions[keys[i]]);
     }
   }
