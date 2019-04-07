@@ -38,6 +38,11 @@ const sessions = {
     startTime: time - DAY * 2,
     endTime: time - DAY * 2 + HOUR,
   },
+  activeSession: {
+    groupId: 'testgroup',
+    startTime: time - MINUTE * 20,
+    endTime: time - MINUTE * 20 + HOUR,
+  },
 };
 
 const users = {
