@@ -1,4 +1,3 @@
-import { get } from 'lodash/object';
 import PropTypes from 'prop-types';
 import React from 'react';
 import Nav from 'react-bootstrap/Nav';
@@ -20,10 +19,10 @@ const renderNavLink = (href, linkText, push, pathname) => (
   </Nav.Link>
 );
 
-const renderNavDropdown = (uid, push, onClickLogout) => (
+const renderNavDropdown = (uid, name, push, onClickLogout) => (
   uid
     ? (
-      <NavDropdown title={uid} alignRight>
+      <NavDropdown title={name || uid} alignRight>
         <NavDropdown.Item onClick={() => push('settings')}>
           <IconedText icon={SettingsIcon}>Settings</IconedText>
         </NavDropdown.Item>
@@ -42,8 +41,10 @@ const AppNavbar = (props) => {
     location: { pathname },
     onClickLogout,
     uid,
-    user,
+    user = {},
   } = props;
+
+  const { name, userType } = user;
 
   return (
     <Navbar bg="dark" variant="dark" expand="sm">
@@ -70,7 +71,7 @@ const AppNavbar = (props) => {
             )
           }
           {
-            get(user, 'userType') === 'admin'
+            userType === 'admin'
               ? renderNavLink(
                 '/groups',
                 <IconedText icon={GroupsIcon}>Group Management</IconedText>,
@@ -82,7 +83,7 @@ const AppNavbar = (props) => {
         </Nav>
 
         { /* Right-aligned section */ }
-        <Nav>{renderNavDropdown(uid, push, onClickLogout)}</Nav>
+        <Nav>{renderNavDropdown(uid, name, push, onClickLogout)}</Nav>
       </Navbar.Collapse>
     </Navbar>
   );
