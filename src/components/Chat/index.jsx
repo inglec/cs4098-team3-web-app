@@ -77,17 +77,21 @@ class Chat extends Component {
             </div>
           </Scrollbar>
         </div>
-        <TextBox placeholder="Send a message" onSubmit={sendMessage}>
-          <SendIcon />
-        </TextBox>
+        {
+          selfUid
+            ? (
+              <TextBox placeholder="Send a message" onSubmit={sendMessage}>
+                <SendIcon />
+              </TextBox>
+            )
+            : null
+        }
       </div>
     );
   }
 }
 
 Chat.propTypes = {
-  selfUid: PropTypes.string.isRequired,
-  sendMessage: PropTypes.func.isRequired,
   messages: PropTypes.arrayOf(
     PropTypes.exact({
       text: PropTypes.string.isRequired,
@@ -96,6 +100,14 @@ Chat.propTypes = {
     }),
   ).isRequired,
   userUids: PropTypes.arrayOf(PropTypes.string).isRequired,
+
+  selfUid: PropTypes.string,
+  sendMessage: PropTypes.func,
+};
+
+Chat.defaultProps = {
+  selfUid: '',
+  sendMessage: () => {},
 };
 
 export default Chat;

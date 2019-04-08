@@ -1,5 +1,12 @@
 import { parse } from 'query-string';
 
+const SECOND = 1000;
+const MINUTE = SECOND * 60;
+const HOUR = MINUTE * 60;
+const DAY = HOUR * 24;
+
+const time = new Date().getTime();
+
 // Get "uid" from search params
 const { uid } = parse(window.location.search);
 
@@ -9,24 +16,68 @@ const auth = {
 };
 
 const chat = {
-  testsession: [],
+  pastsession1: [
+    {
+      sender: 'inglec',
+      text: 'hello everyone',
+      timestamp: time - DAY + MINUTE,
+    },
+    {
+      sender: 'ebergman',
+      text: 'Hi Ciarán, how are you?',
+      timestamp: time - DAY + MINUTE + SECOND * 10,
+    },
+    {
+      sender: 'inglec',
+      text: 'good',
+      timestamp: time - DAY + MINUTE + SECOND * 20,
+    },
+    {
+      sender: 'inglec',
+      text: 'you?',
+      timestamp: time - DAY + MINUTE + SECOND * 25,
+    },
+    {
+      sender: 'ebergman',
+      text: 'I\'m doing well.',
+      timestamp: time - DAY + MINUTE + SECOND * 30,
+    },
+    {
+      sender: 'ebergman',
+      text: 'Are we ready to begin soon?\nI think we\'re all here.',
+      timestamp: time - DAY + MINUTE + SECOND * 40,
+    },
+    {
+      sender: 'inglec',
+      text: 'sounds good to me',
+      timestamp: time - DAY + MINUTE + SECOND * 55,
+    },
+    {
+      sender: 'inglec',
+      text: 'let me just find my medication',
+      timestamp: time - DAY + MINUTE * 2,
+    },
+    {
+      sender: 'inglec',
+      text: 'its around here somewhere',
+      timestamp: time - DAY + MINUTE * 2 + SECOND * 10,
+    },
+    {
+      sender: 'inglec',
+      text: 'got it lets go',
+      timestamp: time - DAY + MINUTE * 2 + SECOND * 30,
+    },
+  ],
 };
 
 const groups = {
   testgroup: {
     groupName: 'Test Group',
-    admin: 'alice',
+    admin: 'ebergman',
     users: ['asmirnov', 'conevin', 'cosgroco', 'ebergman', 'inglec', 'meaneych'],
     mentors: [],
   },
 };
-
-const SECOND = 1000;
-const MINUTE = SECOND * 60;
-const HOUR = MINUTE * 60;
-const DAY = HOUR * 24;
-
-const time = new Date().getTime();
 
 const sessions = {
   futuresession1: {
@@ -61,9 +112,10 @@ const sessions = {
       },
     },
     review: {
-      reviewedBy: 'alice',
+      reviewedBy: 'ebergman',
       confirmed: ['ebergman', 'inglec'],
     },
+    archiveUrl: 'http://techslides.com/demos/sample-videos/small.mp4',
   },
   pastsession2: {
     groupId: 'testgroup',
@@ -86,9 +138,10 @@ const sessions = {
       },
     },
     review: {
-      reviewedBy: 'alice',
+      reviewedBy: 'ebergman',
       confirmed: ['asmirnov', 'conevin'],
     },
+    archiveUrl: 'http://techslides.com/demos/sample-videos/small.mp4',
   },
   pastsession3: {
     groupId: 'testgroup',
@@ -106,6 +159,7 @@ const sessions = {
         tickedAt: time - DAY * 3 + MINUTE * 13,
       },
     },
+    archiveUrl: 'http://techslides.com/demos/sample-videos/small.mp4',
   },
 };
 

@@ -1,5 +1,6 @@
 import moment from 'moment';
 import PropTypes from 'prop-types';
+import { stringify } from 'query-string';
 import React from 'react';
 import Badge from 'react-bootstrap/Badge';
 import Button from 'react-bootstrap/Button';
@@ -32,14 +33,14 @@ const renderSessionId = (sessionId, sessions, userType) => {
   );
 };
 
-const renderSelectedSession = (selectedSession, groups, user, users, history) => {
+const renderSelectedSession = (selectedSessionId, sessions, groups, user, users, history) => {
   const {
     attendance = {},
     endTime,
     groupId,
     review = {},
     startTime,
-  } = selectedSession;
+  } = sessions[selectedSessionId];
 
   const startTimeString = formatDate(startTime);
   const endTimeString = formatDate(endTime);
@@ -52,6 +53,9 @@ const renderSelectedSession = (selectedSession, groups, user, users, history) =>
   const { users: groupUsers } = groups[groupId];
   const confirmed = review.confirmed || [];
   const isAdmin = user.userType === 'admin';
+  const onClickArchive = () => (
+    history.push(`/review?${stringify({ sessionId: selectedSessionId })}`)
+  );
 
   return (
     <Form>
@@ -87,12 +91,7 @@ const renderSelectedSession = (selectedSession, groups, user, users, history) =>
       {
         isAdmin
           ? (
-            <Button
-              block
-              size="md"
-              variant="outline-primary"
-              onClick={() => history.push('/review')}
-            >
+            <Button block size="md" variant="outline-primary" onClick={onClickArchive}>
               View Session Archive
             </Button>
           )
@@ -118,7 +117,9 @@ const Archives = (props) => {
           keys={Object.keys(sessions)}
           leftTitle="Archived Sessions"
           renderContent={
-            selected => renderSelectedSession(sessions[selected], groups, user, users, history)
+            selectedSessionId => (
+              renderSelectedSession(selectedSessionId, sessions, groups, user, users, history)
+            )
           }
           renderKey={key => renderSessionId(key, sessions, user.userType)}
           rightTitle="Session Information"

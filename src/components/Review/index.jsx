@@ -1,129 +1,71 @@
-import _ from 'lodash';
-import React from 'react';
+/* eslint-disable jsx-a11y/media-has-caption */
+
+import { map } from 'lodash/collection';
+import moment from 'moment';
 import PropTypes from 'prop-types';
+import React from 'react';
+import Badge from 'react-bootstrap/Badge';
+import Card from 'react-bootstrap/Card';
 
-import Jumbotron from 'react-bootstrap/Jumbotron';
-import Collapse from 'react-bootstrap/Collapse';
-import Button from 'react-bootstrap/Button';
-
-import { patientsByGroup, getVideoById } from 'app-utils/requests';
-
-import Video from './Video';
-import LogMessage from './LogMessage';
-import Profile from './Profile';
+import Chat from 'app-components/Chat';
 
 import './styles';
 
-class Review extends React.Component {
-  constructor(props) {
-    super(props);
+const renderTimestamp = (text, timestamp) => (
+  <div>
+    {text}
+    <Badge pill variant="light">{moment(timestamp).format('HH:mm:ss')}</Badge>
+  </div>
+);
 
-    this.state = {
-      patients: [],
-      peoplePresent: 0,
-      videoSrc: null,
-      videoLog: [],
-      notesOpen: false,
-    };
+const renderAttendance = (attendance, users) => (
+  <div className="review-attendance">
+    {
+      map(attendance, ({ joinedAt, leftAt }, uid) => {
+        const { avatarUrl, name } = users[uid];
 
-    // Promise: Get video src for the review
-    getVideoById(props.videoId)
-      .then(({ videoSrc, videoLog }) => {
-        this.setState({ videoSrc, videoLog });
+        return (
+          <Card key={uid}>
+            <Card.Body>
+              <img src={avatarUrl} alt={uid} />
+              <Card.Title>{name}</Card.Title>
+              {renderTimestamp('Joined at', joinedAt)}
+              {renderTimestamp('Left at', leftAt)}
+            </Card.Body>
+          </Card>
+        );
       })
-      .catch((error) => {
-        // Display some error, video not found
-        console.error(error);
-      });
+    }
+  </div>
+);
 
-    patientsByGroup(props.groupId)
-      .then((patients) => {
-        // Definitely a better way to do this (reduce)
-        let peoplePresent = 0;
-        patients.forEach((patient) => {
-          if (patient.present) {
-            peoplePresent += 1;
-          }
-        });
-        this.setState({ patients, peoplePresent });
-      })
-      .catch((error) => {
-        // Display some error, patients not found
-        console.error(error);
-      });
-  }
+const Review = ({ chat, session, users }) => {
+  const { archiveUrl, attendance } = session;
 
-  render() {
-    const {
-      videoSrc, videoLog, patients, notesOpen, peoplePresent,
-    } = this.state;
-
-    return (
-      <div className="page review">
-
-        <div className="mainview">
-          <Jumbotron className="video-container">
-            <Video
-              videoSrc={videoSrc}
-            />
-          </Jumbotron>
-
-          <div className="bottom">
-
-            <div className="profiles">
-              {
-                _.map(patients, patientProfile => (
-                  <Profile
-                    key={patientProfile.uid}
-                    profile={patientProfile}
-                    peoplePresent={peoplePresent}
-                  />
-                ))
-              }
-            </div>
-
-            <div className="log-button-container">
-              <Button
-                onClick={() => this.setState({ notesOpen: !notesOpen })}
-                className="log-button"
-                variant="outline-secondary"
-              >
-                Session Log
-              </Button>
-            </div>
-
-          </div>
-
+  return (
+    <div className="page review">
+      <div className="review-main">
+        <div className="review-video">
+          <video controls>
+            <source src={archiveUrl} type="video/mp4" />
+          </video>
         </div>
-
-        <Collapse timeout={300} in={notesOpen}>
-          <div className="log">
-            <div className="log-messages">
-              {
-                _.map(videoLog, ({
-                  type, sender, timestamp, message,
-                }) => (
-                  <LogMessage
-                    key={timestamp}
-                    type={type}
-                    sender={sender}
-                    timestamp={timestamp}
-                    message={message}
-                  />
-                ))
-              }
-            </div>
-          </div>
-        </Collapse>
-
+        {renderAttendance(attendance, users)}
       </div>
-    );
-  }
-}
+      <Chat messages={chat} userUids={Object.keys(session.attendance)} />
+    </div>
+  );
+};
 
 Review.propTypes = {
-  videoId: PropTypes.string.isRequired,
-  groupId: PropTypes.string.isRequired,
+  session: PropTypes.object.isRequired,
+  users: PropTypes.object.isRequired,
+
+  chat: PropTypes.array,
+};
+
+Review.defaultProps = {
+  chat: [],
 };
 
 export default Review;
