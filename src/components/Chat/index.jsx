@@ -32,9 +32,9 @@ class Chat extends Component {
   render() {
     const {
       messages,
-      userUids,
       selfUid,
       sendMessage,
+      userUids,
     } = this.props;
 
     // Create a new colour if there is a new chatUser
@@ -77,7 +77,7 @@ class Chat extends Component {
             </div>
           </Scrollbar>
         </div>
-        <TextBox onSubmit={sendMessage}>
+        <TextBox placeholder="Send a message" onSubmit={sendMessage}>
           <SendIcon />
         </TextBox>
       </div>
@@ -88,7 +88,6 @@ class Chat extends Component {
 Chat.propTypes = {
   selfUid: PropTypes.string.isRequired,
   sendMessage: PropTypes.func.isRequired,
-  sessionId: PropTypes.string,
   messages: PropTypes.arrayOf(
     PropTypes.exact({
       text: PropTypes.string.isRequired,

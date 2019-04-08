@@ -25,7 +25,7 @@ const renderSessionId = (sessionId, sessions, userType) => {
   const startTimeString = formatDate(startTime);
 
   return (
-    <span>
+    <span className="sessionkey">
       <TitleSubtitle subtitle={startTimeString} title={sessionId} />
       {status}
     </span>
@@ -122,7 +122,7 @@ const Archives = (props) => {
           }
           renderKey={key => renderSessionId(key, sessions, user.userType)}
           rightTitle="Session Information"
-          unselectedMessage="Select a session from the left-hand pane to begin"
+          unselectedMessage="Select a session to begin"
         />
       </div>
     </div>
