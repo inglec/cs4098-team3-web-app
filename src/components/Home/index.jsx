@@ -11,7 +11,7 @@ import './styles';
 const renderSessionBox = (sessionId, startTime, endTime, isActive, onClick) => {
   const startTimeString = moment(startTime).format('Do MMMM, h:mma');
   const status = `Session ${isActive ? 'is active' : 'has not yet begun'}.`;
-  const imageSrc = `../../data/test/${isActive ? 'live.png' : 'future.png'}`;
+  const imageSrc = `../../data/images/${isActive ? 'live.png' : 'future.png'}`;
 
   return (
     <Card key={sessionId}>
