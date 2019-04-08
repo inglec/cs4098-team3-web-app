@@ -9,19 +9,16 @@ class TextBox extends Component {
     super(props);
 
     this.inputRef = null;
+    this.keyboardListener = event => this.onKeyPressed(event);
     this.state = { text: '' };
   }
 
-  componentDidMount() {
-    document.addEventListener('keydown', event => this.onKeyPressed(event));
-  }
-
   componentWillUnmount() {
-    document.removeEventListener('keydown', event => this.onKeyPressed(event));
+    this.removeKeyboardListener();
   }
 
   onKeyPressed({ key }) {
-    // Check if text box is selected
+    // Check if input text box is selected
     const isInputActive = document.activeElement === this.inputRef;
 
     if (isInputActive && key === 'Enter') {
@@ -42,17 +39,24 @@ class TextBox extends Component {
   }
 
   setInputRef(ref) {
-    // Remove old event listener
-    if (this.inputRef) {
-      this.inputRef.removeEventListener('keydown', event => this.onKeyPressed(event));
-    }
-
-    // Add new event listener
-    if (ref) {
-      ref.addEventListener('keydown', event => this.onKeyPressed(event));
-    }
-
+    // Remove listener from old ref
+    this.removeKeyboardListener();
     this.inputRef = ref;
+
+    // Add listener to new ref
+    this.addKeyboardListener();
+  }
+
+  addKeyboardListener() {
+    if (this.inputRef) {
+      this.inputRef.addEventListener('keydown', this.keyboardListener);
+    }
+  }
+
+  removeKeyboardListener() {
+    if (this.inputRef) {
+      this.inputRef.removeEventListener('keydown', this.keyboardListener);
+    }
   }
 
   render() {
@@ -64,9 +68,9 @@ class TextBox extends Component {
         <FormControl
           as="input"
           placeholder={placeholder}
+          value={text}
           onChange={event => this.onTextChange(event)}
           ref={ref => this.setInputRef(ref)}
-          value={text}
         />
         <InputGroup.Append>
           <Button
