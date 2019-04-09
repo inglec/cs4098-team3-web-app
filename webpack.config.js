@@ -29,7 +29,7 @@ module.exports = {
     alias: {
       'app-root': __dirname,
       'app-components': path.resolve(__dirname, 'src/components'),
-      'app-config': path.resolve(__dirname, 'src/config.dev.json'),
+      'app-config': path.resolve(__dirname, 'src/config.prod.json'),
       'app-containers': path.resolve(__dirname, 'src/containers'),
       'app-proptypes': path.resolve(__dirname, 'src/proptypes'),
       'app-redux': path.resolve(__dirname, 'src/redux'),
