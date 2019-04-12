@@ -21,7 +21,7 @@ sudo apt install nodejs
 
 Clone the repository:
 ``` bash
-git clone https://github.com/inglec/tb-or-not-tb-client client
+git clone https://github.com/inglec/cs4098-team3-web-app client
 ```
 
 Install dependencies specified in `package.json`:
