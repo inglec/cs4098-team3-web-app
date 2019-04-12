@@ -1,4 +1,4 @@
-# TB or not TB: Client Application
+# CS4098 Team 3: Web Application
 
 This application is the client-side web application.
 
@@ -59,25 +59,6 @@ npm run lint
 ```
 
 If you use Atom, the [linter-eslint](https://atom.io/packages/linter-eslint) package shows linting errors in the editor.
-
-## Redux Store
-
-The Redux store holds the application state and cached data.
-
-``` js
-{
-  auth: {
-    state: 'LOADING' | 'LOADED',
-    username: String,
-    token: String,
-    error: String
-  }
-}
-```
-
-TODO:
-* Cache session information.
-* Cache session chat log.
 
 ## Directory Structure
 
