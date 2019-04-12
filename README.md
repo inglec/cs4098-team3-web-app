@@ -3,9 +3,8 @@
 This application is the client-side web application.
 
 Related repositories:
-* [API Server](https://github.com/inglec/tb-or-not-tb-api-server)
-* [Load Balancer](https://github.com/inglec/tb-or-not-tb-load-balancer)
-* [Video Server](https://github.com/inglec/tb-or-not-tb-video-server)
+* [API Server](https://github.com/inglec/cs4098-team3-api-server)
+* [Video Server](https://github.com/inglec/cs4098-team3-video-server)
 
 ## Installation
 
